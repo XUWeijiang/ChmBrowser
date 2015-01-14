@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resources">
+      <UniqueIdentifier>ce7984a1-2f4f-4d3c-872d-2776846313d7</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tga;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="lzx.cpp" />
+    <ClCompile Include="chm_lib.cpp" />
+    <ClCompile Include="ChmDoc.cpp" />
+    <ClCompile Include="ChmModel.cpp" />
+    <ClCompile Include="BaseUtil.cpp" />
+    <ClCompile Include="StrUtil.cpp" />
+    <ClCompile Include="FileUtil.cpp" />
+    <ClCompile Include="TrivialHtmlParser.cpp" />
+    <ClCompile Include="HtmlParserLookup.cpp" />
+    <ClCompile Include="HtmlPullParser.cpp" />
+    <ClCompile Include="Chm.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="chm_lib.h" />
+    <ClInclude Include="lzx.h" />
+    <ClInclude Include="ChmDoc.h" />
+    <ClInclude Include="ChmModel.h" />
+    <ClInclude Include="util.h" />
+    <ClInclude Include="BaseUtil.h" />
+    <ClInclude Include="Scoped.h" />
+    <ClInclude Include="StrUtil.h" />
+    <ClInclude Include="Vec.h" />
+    <ClInclude Include="ByteReader.h" />
+    <ClInclude Include="FileUtil.h" />
+    <ClInclude Include="TrivialHtmlParser.h" />
+    <ClInclude Include="HtmlParserLookup.h" />
+    <ClInclude Include="HtmlPullParser.h" />
+    <ClInclude Include="Chm.h" />
+  </ItemGroup>
+</Project>

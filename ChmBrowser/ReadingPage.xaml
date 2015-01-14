@@ -1,0 +1,25 @@
+﻿<Page
+    x:Class="ChmBrowser.ReadingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ChmBrowser"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <WebView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="webView"/>
+    </Grid>
+    <Page.BottomAppBar>
+        <CommandBar>
+            <CommandBar.PrimaryCommands>
+                <AppBarButton Label="上一页" Click="Previous_Click" Icon="Back">
+                </AppBarButton>
+                <AppBarButton Label="目录" Click="Contents_Click" Icon="AlignLeft">
+                </AppBarButton>
+                <AppBarButton Label="下一页" Click="Next_Click" Icon="Forward"></AppBarButton>
+            </CommandBar.PrimaryCommands>
+        </CommandBar>
+    </Page.BottomAppBar>
+</Page>
