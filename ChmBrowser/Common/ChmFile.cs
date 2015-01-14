@@ -117,7 +117,7 @@ namespace ChmBrowser.Common
                 var file = await localFolder.GetFileAsync(key + ChmFileExtension);
                 ret.Chm = new ChmCore.Chm(file.Path);
                 ret.ChmMeta = await MetaInfo.ReadMetaInfo(key);
-                ret.HasThumbnail = true;
+                ret.HasThumbnail = await Snapshot.HasSnapshot(key);
                 //try
                 //{
                 //    Windows.UI.Xaml.Media.Imaging.BitmapImage image = new Windows.UI.Xaml.Media.Imaging.BitmapImage();
@@ -164,6 +164,7 @@ namespace ChmBrowser.Common
             if (await Snapshot.CreateSnapshot(Key, create))
             {
                 HasThumbnail = true;
+                FileHistory.UpdateImage(Key);
             }
         }
 

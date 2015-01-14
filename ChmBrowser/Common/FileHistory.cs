@@ -80,6 +80,21 @@ namespace ChmBrowser.Common
             _chmHistoryFiles.Entries = newHistory;
             return newHistory;
         }
+
+        public static async void UpdateImage(string key)
+        {
+            if (_chmHistoryFiles != null)
+            {
+                foreach (var x in _chmHistoryFiles.Entries)
+                {
+                    if (x.Key == key)
+                    {
+                        x.Image = await Snapshot.LoadSnapshot(key);
+                    }
+                }
+            }
+        }
+
         public static void UpdateHistoryWhenOpenFile(string name)
         {
             IList<string> historyList = GetHistory();
