@@ -5,7 +5,7 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChmBrowser", "ChmBrowser.csproj", "{F4286254-8006-4E5C-8A9A-60832229DE21}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChmCore", "ChmCore\ChmCore.vcxproj", "{F483B718-7005-4228-8D4F-38928CDC1F36}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChmCore", "..\ChmCore\ChmCore.vcxproj", "{F483B718-7005-4228-8D4F-38928CDC1F36}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

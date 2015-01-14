@@ -123,27 +123,27 @@ namespace ChmBrowser.Common
             }
         }
 
-        private static uint GetPixel(byte[] pixelData, uint width, uint x, uint y)
-        {
+        //private static uint GetPixel(byte[] pixelData, uint width, uint x, uint y)
+        //{
 
-        }
+        //}
 
-        private static byte[] TrimImage(byte[] pixelData, ref uint width, ref uint height)
-        {
-            uint bytesPerPixel = sizeof(byte) * 4;
-            uint bytestPerLine = width * bytesPerPixel;
+        //private static byte[] TrimImage(byte[] pixelData, ref uint width, ref uint height)
+        //{
+        //    uint bytesPerPixel = sizeof(byte) * 4;
+        //    uint bytestPerLine = width * bytesPerPixel;
 
-            uint rightTopColor = pixelData[bytesPerPixel * (width - 1)]
-        }
+        //    uint rightTopColor = pixelData[bytesPerPixel * (width - 1)]
+        //}
     }
 
 
-    private class ImageCropper
-    {
-        public ImageCropper(byte[] pixelData, uint width, uint height)
-        {
+    //private class ImageCropper
+    //{
+    //    public ImageCropper(byte[] pixelData, uint width, uint height)
+    //    {
 
-        }
-    }
+    //    }
+    //}
 
 }
