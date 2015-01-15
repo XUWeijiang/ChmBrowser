@@ -8,9 +8,12 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <Page.Resources>
+        <MenuFlyout x:Key="itemMenuFlyout">
+            <MenuFlyoutItem Text="删除" DataContext="{Binding}" Click="deleteItem_Click"/>
+        </MenuFlyout>
         <DataTemplate x:Key="GridViewItemTemplate">
             <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-                <Grid Margin="10,10,0,0">
+                <Grid Margin="10,10,0,0" FlyoutBase.AttachedFlyout="{StaticResource itemMenuFlyout}" Holding="ItemGridView_Holding">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="96"/>
                         <RowDefinition Height="Auto"/>
@@ -33,7 +36,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
         <!-- Title Panel -->
         <StackPanel Grid.Row="0" Margin="19,0,0,0">
             <TextBlock Text="CHM阅读器" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
@@ -53,10 +55,10 @@
                         ShowsScrollingPlaceholders="False" 
                         VerticalAlignment="Top" 
                         ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                        ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionMode="None"
+                        ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionMode="Single"
                         IsHoldingEnabled="True"
                         IsItemClickEnabled="True" ItemClick="ItemGridView_ItemClick"
-                        Holding="ItemGridView_Holding"
+                        
                     >
                     <GridView.ItemContainerStyle>
                         <Style TargetType="GridViewItem">

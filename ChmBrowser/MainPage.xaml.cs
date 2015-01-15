@@ -99,6 +99,10 @@ namespace ChmBrowser
 
         private void ItemGridView_Holding(object sender, HoldingRoutedEventArgs e)
         {
+            if (e.HoldingState == Windows.UI.Input.HoldingState.Started)
+            {
+                FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
+            }
         }
 
         private async void oneDriveButton_Click(object sender, RoutedEventArgs e)
@@ -133,6 +137,13 @@ namespace ChmBrowser
                 MessageDialog msg = new MessageDialog(errorMessage);
                 await msg.ShowAsync();
             }
+        }
+
+        private async void deleteItem_Click(object sender, RoutedEventArgs e)
+        {
+            EntryInfo info = ((FrameworkElement)sender).DataContext as EntryInfo;
+            await FileHistory.DeleteFromHistory(info.Key);
+            _history.Entries = await FileHistory.GetHistoryEntriesInfo();
         }
     }
 }
