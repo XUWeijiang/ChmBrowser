@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="cbb29d65-49f6-4cd0-bc14-6526b6b005c2" Publisher="CN=weijx" Version="1.0.0.0" />
-  <mp:PhoneIdentity PhoneProductId="cbb29d65-49f6-4cd0-bc14-6526b6b005c2" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Identity Name="23419.CHM" Publisher="CN=6E6782C0-FC03-43E1-9B41-12377A813E18" Version="1.1.0.0" />
+  <mp:PhoneIdentity PhoneProductId="e879d0da-892f-4b46-96ad-5b11198c5729" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>ChmBrowser</DisplayName>
-    <PublisherDisplayName>weijx</PublisherDisplayName>
+    <DisplayName>CHM阅读器</DisplayName>
+    <PublisherDisplayName>沙家浜</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Prerequisites>

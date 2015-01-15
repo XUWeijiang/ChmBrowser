@@ -11,6 +11,7 @@ using Windows.Storage.Streams;
 using Windows.Graphics.Imaging;
 using Windows.UI.Xaml.Media.Imaging;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Microsoft.Live;
 
 namespace ChmBrowser.Common
 {
@@ -69,22 +70,28 @@ namespace ChmBrowser.Common
             }
         }
 
-        public static async Task<bool> OpenChmFileFromPhone(IStorageFile storageFile)
+        public static async Task<bool> OpenChmFileFromOneDrive(LiveConnectClient client, 
+            IProgress<LiveOperationProgress> progressHandler,
+            System.Threading.CancellationToken ctoken,
+            string id, string name, string path)
         {
             ChmFile ret = new ChmFile();
-            Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
             ret.Key = Guid.NewGuid().ToString("N");
             ret.HasThumbnail = false;
-            var file = await storageFile.CopyAsync(localFolder, ret.Key + ChmFileExtension);
+            Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+
+            StorageFile file = await localFolder.CreateFileAsync(ret.Key + ChmFileExtension, CreationCollisionOption.ReplaceExisting);
+            LiveDownloadOperationResult result = await client.BackgroundDownloadAsync(id + "/content", file, ctoken, progressHandler);
+            
             try
             {
                 ret.Chm = new ChmCore.Chm(file.Path);
                 MetaInfo meta = new MetaInfo();
-                meta.SetOriginalPath(storageFile.Path);
-                meta.SetDisplayName(System.IO.Path.GetFileNameWithoutExtension(storageFile.Name));
+                meta.SetOriginalPath(path);
+                meta.SetDisplayName(System.IO.Path.GetFileNameWithoutExtension(name));
                 ret.ChmMeta = meta;
                 ret.SetCurrent(ret.Chm.Outline.Next);
-                //await meta.SaveMetaInfo(ret.Key);
+                await meta.SaveMetaInfo(ret.Key);
             }
             catch
             {
@@ -103,6 +110,42 @@ namespace ChmBrowser.Common
             CurrentFile = ret;
             return true;
         }
+
+        public static async Task<bool> OpenChmFileFromPhone(IStorageFile storageFile)
+        {
+            ChmFile ret = new ChmFile();
+            Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+            ret.Key = Guid.NewGuid().ToString("N");
+            ret.HasThumbnail = false;
+            var file = await storageFile.CopyAsync(localFolder, ret.Key + ChmFileExtension);
+            try
+            {
+                ret.Chm = new ChmCore.Chm(file.Path);
+                MetaInfo meta = new MetaInfo();
+                meta.SetOriginalPath(storageFile.Path);
+                meta.SetDisplayName(System.IO.Path.GetFileNameWithoutExtension(storageFile.Name));
+                ret.ChmMeta = meta;
+                ret.SetCurrent(ret.Chm.Outline.Next);
+                await meta.SaveMetaInfo(ret.Key);
+            }
+            catch
+            {
+                if (ret.Chm != null)
+                {
+                    ret.Chm.Dispose();
+                    ret.Chm = null;
+                }
+            }
+            if (ret.Chm == null)
+            {
+                await MetaInfo.DeleteMetaFile(ret.Key);
+                await DeleteFile(ret.Key);
+                return false;
+            }
+            CurrentFile = ret;
+            return true;
+        }
+
         public static async Task<bool> OpenLocalChmFile(EntryInfo entry)
         {
             return await OpenLocalChmFile(entry.Key);

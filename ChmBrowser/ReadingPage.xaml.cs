@@ -93,10 +93,9 @@ namespace ChmBrowser
                 }
             }
         }
-        private async void Previous_Click(object sender, RoutedEventArgs e)
+        private void Previous_Click(object sender, RoutedEventArgs e)
         {
-            string url = await GetWebViewUrl();
-            if (webView.CanGoBack && url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            if (webView.CanGoBack)
             {
                 webView.GoBack();
             }
@@ -109,6 +108,20 @@ namespace ChmBrowser
                     UpdateReading();
                 }
             }
+            //string url = await GetWebViewUrl();
+            //if (webView.CanGoBack && url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            //{
+            //    webView.GoBack();
+            //}
+            //else if (ChmFile.CurrentFile.Current != null)
+            //{
+            //    var prev = ChmFile.CurrentFile.Current.Prev;
+            //    if (prev != null && prev.Parent != null)
+            //    {
+            //        ChmFile.CurrentFile.SetCurrent(prev);
+            //        UpdateReading();
+            //    }
+            //}
         }
         private void UpdateReading()
         {

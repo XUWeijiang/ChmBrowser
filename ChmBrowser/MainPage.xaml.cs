@@ -18,6 +18,7 @@ using Windows.UI.Xaml.Navigation;
 using ChmCore;
 using Windows.UI.Popups;
 using ChmBrowser.Common;
+using Microsoft.Live;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
 
@@ -99,9 +100,39 @@ namespace ChmBrowser
         private void ItemGridView_Holding(object sender, HoldingRoutedEventArgs e)
         {
         }
-        private void menuItemDelete_Click(object sender, RoutedEventArgs e)
-        {
 
+        private async void oneDriveButton_Click(object sender, RoutedEventArgs e)
+        {
+            string errorMessage = null;
+            try
+            {
+                var authClient = new LiveAuthClient();
+                LiveLoginResult result = await authClient.LoginAsync(new string[] { "wl.signin", "wl.skydrive" });
+
+                if (result.Status == LiveConnectSessionStatus.Connected)
+                {
+                    OneDriveBrowserPage.OneDriveSession = result.Session;
+                    Frame.Navigate(typeof(OneDriveBrowserPage));
+                }
+            }
+            catch (LiveAuthException ex)
+            {
+                errorMessage = ex.Message;
+            }
+            catch (LiveConnectException ex)
+            {
+                errorMessage = ex.Message;
+            }
+            catch(Exception ex)
+            {
+                errorMessage = ex.Message;
+            }
+
+            if (errorMessage != null)
+            {
+                MessageDialog msg = new MessageDialog(errorMessage);
+                await msg.ShowAsync();
+            }
         }
     }
 }
