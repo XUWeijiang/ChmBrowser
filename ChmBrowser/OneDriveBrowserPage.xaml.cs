@@ -108,11 +108,13 @@ namespace ChmBrowser
             {
                 try
                 {
-                    progressBar.IsIndeterminate = false;
                     progressBar.Value = 0;
                     var progressHandler = new Progress<LiveOperationProgress>(
                         (progress) => 
-                        { this.progressBar.Value = progress.ProgressPercentage; });
+                        {
+                            progressBar.IsIndeterminate = false; 
+                            this.progressBar.Value = progress.ProgressPercentage;
+                        });
                     var ctsDownload = new System.Threading.CancellationToken();
                     if (await ChmFile.OpenChmFileFromOneDrive(_client, progressHandler, ctsDownload, entry.Id, entry.Name, oneDrivePath.Text))
                     {

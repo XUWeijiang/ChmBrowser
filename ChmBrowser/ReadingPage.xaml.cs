@@ -35,7 +35,7 @@ namespace ChmBrowser
             this.NavigationCacheMode = NavigationCacheMode.Required;
             webView.NavigationCompleted += webView_NavigationCompleted;
         }
-        async void webView_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
+        void webView_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
         {
             if (args.Uri.Scheme == "ms-local-stream")
             {
@@ -47,10 +47,8 @@ namespace ChmBrowser
                     _mutex.WaitOne();
                     try
                     {
-                        // NavigationCompleted is not late enough to do capture....
-                        // So I have no idea how to do this....
-
-                        await ChmFile.CurrentFile.CreateThumbnailFile(async (s) => await webView.CapturePreviewToStreamAsync(s));
+                        // Uncomment to capture thumbnail.
+                        // await ChmFile.CurrentFile.CreateThumbnailFile(async (s) => await webView.CapturePreviewToStreamAsync(s));
                     }
                     finally
                     {

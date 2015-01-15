@@ -2,6 +2,7 @@
 *.ipch
 *.user
 *.suo
+*.sdf
 obj/
 bin/
 Debug/

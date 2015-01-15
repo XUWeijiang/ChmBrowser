@@ -44,6 +44,10 @@ public:
 public:
     virtual void Visit(const WCHAR *name, const WCHAR *url, int level) override
     {
+        if (url == nullptr)
+        {
+            return;
+        }
         while (!topics_stack_.empty() && topics_stack_.top()->Level >= level)
         {
             topics_stack_.pop();
