@@ -53,7 +53,7 @@ namespace ChmBrowser
         {
             if (args.Uri.Scheme == "ms-local-stream")
             {
-                string path = args.Uri.AbsolutePath;
+                string path = args.Uri.AbsolutePath.Substring(ChmFile.CurrentFile.Key.Length + 1);
                 ChmFile.CurrentFile.SetCurrent(path);
                 
                 if (!ChmFile.CurrentFile.HasThumbnail)

@@ -19,7 +19,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Image Grid.Row="0" x:Name="image" Height="96" Width="96" VerticalAlignment="Center" Margin="0,0,10,0" Source="{Binding Image}"/>
-                    <TextBlock TextAlignment="Center" TextTrimming="Clip" Grid.Row="1" x:Name="titleTextBlock" Width="96" TextWrapping="Wrap" MaxLines="2" Text="{Binding Name}" HorizontalAlignment="Center" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="12" FontWeight="Light" FontFamily="Segoe UI"/>
+                    <TextBlock TextAlignment="Center" TextTrimming="CharacterEllipsis" Grid.Row="1" x:Name="titleTextBlock" Width="96" TextWrapping="Wrap" MaxLines="2" Text="{Binding Name}" HorizontalAlignment="Center" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="15" FontWeight="Light" FontFamily="Segoe UI"/>
                 </Grid>
             </Grid>
         </DataTemplate>
@@ -73,16 +73,16 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" x:Name="browseButton" Width="96" Height="96" BorderThickness="0" Click="Button_Click">
+                    <Button Grid.Column="0" x:Name="browseButton" Width="128" Height="128" BorderThickness="0" Click="Button_Click">
                         <Grid>
                             <Image Source="Assets/local.png"/>
-                            <TextBlock Text="手机" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="10" Margin="3" Foreground="White"/>
+                            <TextBlock Text="手机" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="15" Margin="3" Foreground="White"/>
                         </Grid>
                     </Button>
-                    <Button Grid.Column="1" x:Name="oneDriveButton" Width="96" Height="96" BorderThickness="0" Click="oneDriveButton_Click">
+                    <Button Grid.Column="1" x:Name="oneDriveButton" Width="128" Height="128" BorderThickness="0" Click="oneDriveButton_Click">
                         <Grid>
                             <Image Source="Assets/onedrive.png"/>
-                            <TextBlock Text="OneDrive" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="10" Margin="3" Foreground="White"/>
+                            <TextBlock Text="OneDrive" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="15" Margin="3" Foreground="White"/>
                         </Grid>
                     </Button>
                 </Grid>

@@ -23,7 +23,7 @@
 
         <!-- Title Panel -->
         <StackPanel Grid.Row="0" Margin="19,0,0,0">
-            <TextBlock Text="CHM阅读器" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
+            <TextBlock Text="CHM阅读器" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0" x:Name="bookNameBlock" TextWrapping="WrapWholeWords"/>
             <TextBlock Text="目录" Margin="0,-6.5,0,10" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
         </StackPanel>
 
@@ -34,4 +34,14 @@
             </ScrollViewer>
         </Grid>
     </Grid>
+    <Page.BottomAppBar>
+        <CommandBar ClosedDisplayMode="Minimal">
+            <CommandBar.PrimaryCommands>
+                <AppBarButton Label="顶部" Click="GoTop_Click"  Icon="Upload">
+                </AppBarButton>
+                <AppBarButton Label="底部" Click="GoBottom_Click" Icon="Download">
+                </AppBarButton>
+            </CommandBar.PrimaryCommands>
+        </CommandBar>
+    </Page.BottomAppBar>
 </Page>

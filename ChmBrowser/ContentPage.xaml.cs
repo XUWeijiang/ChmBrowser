@@ -59,6 +59,7 @@ namespace ChmBrowser
             {
                 chmWeak_ = new WeakReference<Chm>(ChmFile.CurrentFile.Chm);
                 outlineControl.ShowData(ChmFile.CurrentFile.Chm.Outline, true);
+                bookNameBlock.Text = ChmFile.CurrentFile.ChmMeta.GetDisplayName();
             }
         }
 
@@ -81,6 +82,15 @@ namespace ChmBrowser
             }
 
             childrenSV.ChangeView(horizontalOffset, verticalOffset, 1);
+        }
+
+        private void GoTop_Click(object sender, RoutedEventArgs e)
+        {
+            childrenSV.ChangeView(0, 0, null);
+        }
+        private void GoBottom_Click(object sender, RoutedEventArgs e)
+        {
+            childrenSV.ChangeView(0, childrenSV.ScrollableHeight, null);
         }
     }
 }
