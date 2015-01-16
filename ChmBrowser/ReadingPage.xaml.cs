@@ -77,13 +77,15 @@ namespace ChmBrowser
         /// </summary>
         /// <param name="e">Event data that describes how this page was reached.
         /// This parameter is typically used to configure the page.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
+            await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().HideAsync();
             UpdateReading();
         }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        protected async override void OnNavigatedFrom(NavigationEventArgs e)
         {
+            await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().ShowAsync();
             base.OnNavigatedFrom(e);
         }
 
