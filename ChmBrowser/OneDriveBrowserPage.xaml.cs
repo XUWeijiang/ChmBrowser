@@ -162,11 +162,12 @@ namespace ChmBrowser
                     }
                 }
             }
+            entries.Sort();
             return entries;
         }
     }
 
-    class OneDriveEntry
+    class OneDriveEntry: IComparable<OneDriveEntry>
     {
         public bool IsFile { get; set; }
         public string Name { get; set; }
@@ -184,6 +185,15 @@ namespace ChmBrowser
                     return new BitmapImage(new Uri("ms-appx:///Assets/folder.png"));
                 }
             } 
+        }
+
+        public int CompareTo(OneDriveEntry other)
+        {
+            if (IsFile == other.IsFile)
+            {
+                return string.Compare(Name, other.Name, StringComparison.CurrentCultureIgnoreCase);
+            }
+            return IsFile.CompareTo(other.IsFile);
         }
     }
 

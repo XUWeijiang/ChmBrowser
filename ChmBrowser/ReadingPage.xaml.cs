@@ -34,6 +34,16 @@ namespace ChmBrowser
             this.InitializeComponent();
             this.NavigationCacheMode = NavigationCacheMode.Required;
             webView.NavigationCompleted += webView_NavigationCompleted;
+            webView.NavigationStarting += webView_NavigationStarting;
+        }
+
+        async void webView_NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs args)
+        {
+            if (args.Uri.Scheme != "ms-local-stream")
+            {
+                args.Cancel = true;
+                await Windows.System.Launcher.LaunchUriAsync(args.Uri);
+            }
         }
         void webView_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
         {

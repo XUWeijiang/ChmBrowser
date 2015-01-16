@@ -76,13 +76,13 @@
                     <Button Grid.Column="0" x:Name="browseButton" Width="96" Height="96" BorderThickness="0" Click="Button_Click">
                         <Grid>
                             <Image Source="Assets/local.png"/>
-                            <TextBlock Text="手机" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="10" Margin="3"/>
+                            <TextBlock Text="手机" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="10" Margin="3" Foreground="White"/>
                         </Grid>
                     </Button>
                     <Button Grid.Column="1" x:Name="oneDriveButton" Width="96" Height="96" BorderThickness="0" Click="oneDriveButton_Click">
                         <Grid>
                             <Image Source="Assets/onedrive.png"/>
-                            <TextBlock Text="OneDrive" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="10" Margin="3"/>
+                            <TextBlock Text="OneDrive" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="10" Margin="3" Foreground="White"/>
                         </Grid>
                     </Button>
                 </Grid>
