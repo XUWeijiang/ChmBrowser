@@ -14,12 +14,16 @@
     <Page.BottomAppBar>
         <CommandBar>
             <CommandBar.PrimaryCommands>
-                <AppBarButton Label="上一页" Click="Previous_Click" Icon="Back">
+                <AppBarButton Label="上一章" Click="Previous_Click" Icon="Back">
                 </AppBarButton>
                 <AppBarButton Label="目录" Click="Contents_Click" Icon="AlignLeft">
                 </AppBarButton>
-                <AppBarButton Label="下一页" Click="Next_Click" Icon="Forward"></AppBarButton>
+                <AppBarButton Label="下一章" Click="Next_Click" Icon="Forward"></AppBarButton>
             </CommandBar.PrimaryCommands>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Label="后退" Click="GoBack_Click"/>
+                <AppBarButton Label="前进" Click="GoForward_Click"/>
+            </CommandBar.SecondaryCommands>
         </CommandBar>
     </Page.BottomAppBar>
 </Page>

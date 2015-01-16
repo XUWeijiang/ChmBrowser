@@ -44,6 +44,10 @@ namespace ChmBrowser
                 args.Cancel = true;
                 await Windows.System.Launcher.LaunchUriAsync(args.Uri);
             }
+            else if (!args.Uri.AbsolutePath.StartsWith("/" + ChmFile.CurrentFile.Key))
+            {
+                args.Cancel = true;
+            }
         }
         void webView_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
         {
@@ -81,7 +85,6 @@ namespace ChmBrowser
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            
         }
 
         private void Contents_Click(object sender, RoutedEventArgs e)
@@ -94,6 +97,10 @@ namespace ChmBrowser
             if (ChmFile.CurrentFile.Current != null)
             {
                 var next = ChmFile.CurrentFile.Current.Next;
+                while (next != null && next.Parent != null && next.Url == ChmFile.CurrentFile.Current.Url)
+                {
+                    next = next.Next;
+                }
                 if (next != null && next.Parent != null)
                 {
                     ChmFile.CurrentFile.SetCurrent(next);
@@ -103,13 +110,13 @@ namespace ChmBrowser
         }
         private void Previous_Click(object sender, RoutedEventArgs e)
         {
-            if (webView.CanGoBack)
-            {
-                webView.GoBack();
-            }
-            else if (ChmFile.CurrentFile.Current != null)
+            if (ChmFile.CurrentFile.Current != null)
             {
                 var prev = ChmFile.CurrentFile.Current.Prev;
+                while (prev != null && prev.Parent != null && prev.Url == ChmFile.CurrentFile.Current.Url)
+                {
+                    prev = prev.Prev;
+                }
                 if (prev != null && prev.Parent != null)
                 {
                     ChmFile.CurrentFile.SetCurrent(prev);
@@ -138,7 +145,7 @@ namespace ChmBrowser
                 try
                 {
                     _mutex.WaitOne();
-                    Uri url = webView.BuildLocalStreamUri("MyTag", ChmFile.CurrentFile.Current.Url);
+                    Uri url = webView.BuildLocalStreamUri("MyTag", ChmFile.CurrentFile.Key + "/" +  ChmFile.CurrentFile.Current.Url);
                     webView.NavigateToLocalStreamUri(url, new ChmStreamUriTResolver());
                     ChmFile.CurrentFile.Save();
                 }
@@ -152,6 +159,22 @@ namespace ChmBrowser
         private async Task<string> GetWebViewUrl()
         {
             return await webView.InvokeScriptAsync("eval", new String[] { "document.location.href;" });
+        }
+
+        private void GoBack_Click(object sender, RoutedEventArgs e)
+        {
+            if (webView.CanGoBack)
+            {
+                webView.GoBack();
+            }
+        }
+
+        private void GoForward_Click(object sender, RoutedEventArgs e)
+        {
+            if (webView.CanGoForward)
+            {
+                webView.GoForward();
+            }
         }
     }
 
@@ -176,7 +199,7 @@ namespace ChmBrowser
             {
                 throw new Exception();
             }
-            string path = uri.AbsolutePath;
+            string path = uri.AbsolutePath.Substring(ChmFile.CurrentFile.Key.Length + 1); 
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 System.Diagnostics.Debug.WriteLine(string.Format("Stream Requested: {0}", uri.ToString()));
