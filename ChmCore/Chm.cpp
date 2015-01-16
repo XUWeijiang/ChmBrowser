@@ -26,6 +26,16 @@ Chm::Chm(Platform::String^ file)
     }
     auto t = doc_->GetTopics();
     Outline = CreateOutlineFromTopic(t, nullptr);
+    WCHAR* title = doc_->GetProperty(DocumentProperty::Prop_Title);
+    if (title != nullptr)
+    {
+        title_ = ref new Platform::String(title);
+        free(title);
+    }
+    else
+    {
+        title_ = nullptr;
+    }
     InitializeCriticalSectionEx(&docAccess_, 0, 0);
 }
 Platform::Array<byte>^ Chm::GetData(Platform::String^ path)

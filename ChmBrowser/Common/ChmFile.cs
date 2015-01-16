@@ -123,7 +123,14 @@ namespace ChmBrowser.Common
                 ret.Chm = new ChmCore.Chm(file.Path);
                 MetaInfo meta = new MetaInfo();
                 meta.SetOriginalPath(storageFile.Path);
-                meta.SetDisplayName(System.IO.Path.GetFileNameWithoutExtension(storageFile.Name));
+                if (ret.Chm.Title != null)
+                {
+                    meta.SetDisplayName(ret.Chm.Title);
+                }
+                else
+                {
+                    meta.SetDisplayName(System.IO.Path.GetFileNameWithoutExtension(storageFile.Name));
+                }
                 ret.ChmMeta = meta;
                 ret.SetCurrent(ret.Chm.Outline.Next);
                 await meta.SaveMetaInfo(ret.Key);

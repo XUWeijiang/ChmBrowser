@@ -83,11 +83,16 @@ namespace ChmCore
     {
     private:
         Platform::String^ file_;
+        Platform::String^ title_;
     public:
         property ChmOutline^ Outline;
         property Platform::String^ FilePath
         {
             Platform::String^ get() { return file_; }
+        }
+        property Platform::String^ Title
+        {
+            Platform::String^ get() { return title_; }
         }
     public:
         Chm(Platform::String^ file);
