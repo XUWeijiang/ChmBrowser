@@ -5,6 +5,7 @@
 *.sdf
 *.obj
 obj/
+AppPackages/
 ARM/
 Release/
 bin/
