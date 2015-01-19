@@ -29,10 +29,13 @@ namespace ChmBrowser
     public sealed partial class ReadingPage : Page
     {
         private Mutex _mutex = new Mutex();
+        private Uri _lastWebViewUrl;
+
         public ReadingPage()
         {
             this.InitializeComponent();
             this.NavigationCacheMode = NavigationCacheMode.Required;
+            _lastWebViewUrl = null;
             webView.NavigationCompleted += webView_NavigationCompleted;
             webView.NavigationStarting += webView_NavigationStarting;
         }
@@ -51,6 +54,7 @@ namespace ChmBrowser
         }
         void webView_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
         {
+            _lastWebViewUrl = args.Uri;
             if (args.Uri.Scheme == "ms-local-stream")
             {
                 string path = args.Uri.AbsolutePath.Substring(ChmFile.CurrentFile.Key.Length + 1);
@@ -148,19 +152,17 @@ namespace ChmBrowser
                 {
                     _mutex.WaitOne();
                     Uri url = webView.BuildLocalStreamUri("MyTag", ChmFile.CurrentFile.Key + "/" +  ChmFile.CurrentFile.Current.Url);
-                    webView.NavigateToLocalStreamUri(url, new ChmStreamUriTResolver());
-                    ChmFile.CurrentFile.Save();
+                    if (_lastWebViewUrl != url)
+                    {
+                        webView.NavigateToLocalStreamUri(url, new ChmStreamUriTResolver());
+                        ChmFile.CurrentFile.Save();
+                    }
                 }
                 finally
                 {
                     _mutex.ReleaseMutex();
                 }
             }
-        }
-
-        private async Task<string> GetWebViewUrl()
-        {
-            return await webView.InvokeScriptAsync("eval", new String[] { "document.location.href;" });
         }
 
         private void GoBack_Click(object sender, RoutedEventArgs e)

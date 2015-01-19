@@ -44,10 +44,17 @@ namespace ChmBrowser
         void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
         {
             Frame rootFrame = Window.Current.Content as Frame;
-            if (rootFrame != null && rootFrame.CanGoBack &&rootFrame.CurrentSourcePageType != typeof(OneDriveBrowserPage))
+            if (rootFrame != null && rootFrame.CanGoBack )
             {
-                e.Handled = true;
-                rootFrame.GoBack();
+                if (rootFrame.CurrentSourcePageType != typeof(OneDriveBrowserPage))
+                {
+                    e.Handled = true;
+                    rootFrame.GoBack();
+                }
+            }
+            else
+            {
+                Application.Current.Exit();
             }
         }
 
