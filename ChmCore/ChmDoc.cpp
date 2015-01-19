@@ -266,9 +266,11 @@ WCHAR *ChmDoc::GetProperty(DocumentProperty prop)
     return result.StealData();
 }
 
-const char *ChmDoc::GetHomePath()
+WCHAR* ChmDoc::GetHomePath()
 {
-    return homePath;
+    ScopedMem<WCHAR> result;
+    result.Set(ToStr(homePath));
+    return result.StealData();
 }
 
 static int ChmEnumerateEntry(struct chmFile *chmHandle, struct chmUnitInfo *info, void *data)

@@ -97,7 +97,7 @@ namespace ChmBrowser.Common
                     meta.SetDisplayName(System.IO.Path.GetFileNameWithoutExtension(name));
                 }
                 ret.ChmMeta = meta;
-                ret.SetCurrent(ret.Chm.Outline.Next);
+                ret.SetCurrent(ret.Chm.Home);
                 await meta.SaveMetaInfo(ret.Key);
             }
             catch
@@ -139,7 +139,7 @@ namespace ChmBrowser.Common
                     meta.SetDisplayName(System.IO.Path.GetFileNameWithoutExtension(storageFile.Name));
                 }
                 ret.ChmMeta = meta;
-                ret.SetCurrent(ret.Chm.Outline.Next);
+                ret.SetCurrent(ret.Chm.Home);
                 await meta.SaveMetaInfo(ret.Key);
             }
             catch
@@ -189,7 +189,7 @@ namespace ChmBrowser.Common
                 //}
                 if (!ret.ChmMeta.ContainsLast())
                 {
-                    ret.SetCurrent(ret.Chm.Outline.Next);
+                    ret.SetCurrent(ret.Chm.Home);
                     //await ret.ChmMeta.SaveMetaInfo(key);
                 }
                 else
@@ -211,7 +211,9 @@ namespace ChmBrowser.Common
         }
 
         public Chm Chm { get; private set; }
-        public ChmOutline Current { get; private set; }
+        private ChmOutline Current { get; set; }
+        public bool HasOutline { get { return Chm.Outline.SubSections != null && Chm.Outline.SubSections.Count > 0; } }
+        public string CurrentPath { get; private set; }
         public MetaInfo ChmMeta { get; private set; }
         public string Key { get; private set; }
         public bool HasThumbnail { get; private set; }
@@ -230,15 +232,62 @@ namespace ChmBrowser.Common
             await ChmMeta.SaveMetaInfo(Key);
         }
 
+        public bool SetNext()
+        {
+            if (HasOutline)
+            {
+                var next = Current.Next;
+                while (next != null && next.Parent != null && next.Url == Current.Url)
+                {
+                    next = next.Next;
+                }
+                if (next != null && next.Parent != null)
+                {
+                    SetCurrent(next);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool SetPrevious()
+        {
+            if (HasOutline)
+            {
+                var prev = Current.Prev;
+                while (prev != null && prev.Parent != null && prev.Url == Current.Url)
+                {
+                    prev = prev.Prev;
+                }
+                if (prev != null && prev.Parent != null)
+                {
+                    SetCurrent(prev);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public void SetCurrent(ChmOutline outline)
         {
             Current = outline;
+            CurrentPath = outline.Url;
             ChmMeta.SetLast(outline.Url);
         }
 
         public bool SetCurrent(string url)
         {
-            url = url.Trim('/');
+            if (!Chm.HasData(url))
+            {
+                return false;
+            }
+            url = url.TrimStart('/');
+            CurrentPath = url;
+            if (!HasOutline)
+            {
+                ChmMeta.SetLast(CurrentPath);
+                return false;
+            }
             if (Current != null && string.Compare(url, Current.Url, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 return true;

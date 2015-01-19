@@ -84,6 +84,7 @@ namespace ChmCore
     private:
         Platform::String^ file_;
         Platform::String^ title_;
+        Platform::String^ home_;
     public:
         property ChmOutline^ Outline;
         property Platform::String^ FilePath
@@ -94,6 +95,10 @@ namespace ChmCore
         {
             Platform::String^ get() { return title_; }
         }
+        property Platform::String^ Home
+        {
+            Platform::String^ get() { return home_; }
+        }
     public:
         Chm(Platform::String^ file);
         virtual ~Chm()
@@ -102,6 +107,7 @@ namespace ChmCore
         }
     public:
         Platform::Array<byte>^ GetData(Platform::String^ path);
+        bool HasData(Platform::String^ path);
     private:
         std::unique_ptr<ChmDoc> doc_;
         CRITICAL_SECTION docAccess_;

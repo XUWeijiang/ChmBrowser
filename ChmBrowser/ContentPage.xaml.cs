@@ -38,8 +38,11 @@ namespace ChmBrowser
 
         void ContentPage_Loaded(object sender, RoutedEventArgs e)
         {
-            HierarchyNode node = outlineControl.LocateItem(ChmFile.CurrentFile.Current);
-            ScrollToView(node);
+            HierarchyNode node = outlineControl.LocateItem(ChmFile.CurrentFile.CurrentPath);
+            if (node != null)
+            {
+                ScrollToView(node);
+            }
         }
 
         void outlineControl_SelectedNodeChanged(object sender, HierarchyNode e)

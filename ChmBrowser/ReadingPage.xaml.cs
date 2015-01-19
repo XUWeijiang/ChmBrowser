@@ -84,6 +84,22 @@ namespace ChmBrowser
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().HideAsync();
+            if (!ChmFile.CurrentFile.HasOutline)
+            {
+                foreach(var x in commandBar.PrimaryCommands)
+                {
+                    (x as AppBarButton).Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                }
+                commandBar.ClosedDisplayMode = AppBarClosedDisplayMode.Minimal;
+            }
+            else
+            {
+                foreach (var x in commandBar.PrimaryCommands)
+                {
+                    (x as AppBarButton).Visibility = Windows.UI.Xaml.Visibility.Visible;
+                }
+                commandBar.ClosedDisplayMode = AppBarClosedDisplayMode.Compact;
+            }
             UpdateReading();
         }
 
@@ -100,58 +116,26 @@ namespace ChmBrowser
 
         private void Next_Click(object sender, RoutedEventArgs e)
         {
-            if (ChmFile.CurrentFile.Current != null)
+            if (ChmFile.CurrentFile.SetNext())
             {
-                var next = ChmFile.CurrentFile.Current.Next;
-                while (next != null && next.Parent != null && next.Url == ChmFile.CurrentFile.Current.Url)
-                {
-                    next = next.Next;
-                }
-                if (next != null && next.Parent != null)
-                {
-                    ChmFile.CurrentFile.SetCurrent(next);
-                    UpdateReading();
-                }
+                UpdateReading();
             }
         }
         private void Previous_Click(object sender, RoutedEventArgs e)
         {
-            if (ChmFile.CurrentFile.Current != null)
+            if (ChmFile.CurrentFile.SetPrevious())
             {
-                var prev = ChmFile.CurrentFile.Current.Prev;
-                while (prev != null && prev.Parent != null && prev.Url == ChmFile.CurrentFile.Current.Url)
-                {
-                    prev = prev.Prev;
-                }
-                if (prev != null && prev.Parent != null)
-                {
-                    ChmFile.CurrentFile.SetCurrent(prev);
-                    UpdateReading();
-                }
+                UpdateReading();
             }
-            //string url = await GetWebViewUrl();
-            //if (webView.CanGoBack && url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-            //{
-            //    webView.GoBack();
-            //}
-            //else if (ChmFile.CurrentFile.Current != null)
-            //{
-            //    var prev = ChmFile.CurrentFile.Current.Prev;
-            //    if (prev != null && prev.Parent != null)
-            //    {
-            //        ChmFile.CurrentFile.SetCurrent(prev);
-            //        UpdateReading();
-            //    }
-            //}
         }
         private void UpdateReading()
         {
-            if (ChmFile.CurrentFile.Current != null && !string.IsNullOrEmpty(ChmFile.CurrentFile.Current.Url))
+            if (!string.IsNullOrEmpty(ChmFile.CurrentFile.CurrentPath))
             {
                 try
                 {
                     _mutex.WaitOne();
-                    Uri url = webView.BuildLocalStreamUri("MyTag", ChmFile.CurrentFile.Key + "/" +  ChmFile.CurrentFile.Current.Url);
+                    Uri url = webView.BuildLocalStreamUri("MyTag", ChmFile.CurrentFile.Key + "/" +  ChmFile.CurrentFile.CurrentPath);
                     if (_lastWebViewUrl != url)
                     {
                         webView.NavigateToLocalStreamUri(url, new ChmStreamUriTResolver());

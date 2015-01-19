@@ -36,6 +36,14 @@ Chm::Chm(Platform::String^ file)
     {
         title_ = nullptr;
     }
+    WCHAR* home = doc_->GetHomePath();
+    WCHAR* url = home;
+    while (*url == '/') // trim backslash.
+    {
+        url++;
+    }
+    home_ = ref new Platform::String(url);
+    free(home);
     InitializeCriticalSectionEx(&docAccess_, 0, 0);
 }
 Platform::Array<byte>^ Chm::GetData(Platform::String^ path)
@@ -53,4 +61,11 @@ Platform::Array<byte>^ Chm::GetData(Platform::String^ path)
     {
         return ref new Platform::Array<byte>(data, length);
     }
+}
+bool Chm::HasData(Platform::String^ path)
+{
+    ScopedCritSec scope(&docAccess_);
+    ScopedMem<WCHAR> plainUrl(url::GetFullPath(path->Data()));
+    ScopedMem<char> urlUtf8(str::conv::ToUtf8(plainUrl));
+    return doc_->HasData(urlUtf8);
 }

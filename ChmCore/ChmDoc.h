@@ -32,7 +32,7 @@ public:
     WCHAR *ToStr(const char *text);
 
     WCHAR *GetProperty(DocumentProperty prop);
-    const char *GetHomePath();
+    WCHAR *GetHomePath();
     Vec<char *> *GetAllPaths();
 
     bool HasToc() const;

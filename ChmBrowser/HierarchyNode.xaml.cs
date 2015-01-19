@@ -75,9 +75,9 @@ namespace ChmBrowser
         public ChmCore.ChmOutline Data {get {return _data;}}
         public HierarchyNode ParentNode {get {return _parent;}}
 
-        public HierarchyNode LocateItem(ChmCore.ChmOutline data)
+        public HierarchyNode LocateItem(string url)
         {
-            if (string.Compare(data.Url, _data.Url, StringComparison.OrdinalIgnoreCase) == 0)
+            if (string.Compare(url, _data.Url, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 Select(false);
                 return this;
@@ -86,7 +86,7 @@ namespace ChmBrowser
             {
                 foreach (var x in childrenSP.Children)
                 {
-                    HierarchyNode r = ((HierarchyNode)x).LocateItem(data);
+                    HierarchyNode r = ((HierarchyNode)x).LocateItem(url);
                     if (r != null) return r;
                 }
             }

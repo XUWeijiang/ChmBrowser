@@ -16,7 +16,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Image Grid.Column="0" x:Name="image" Height="64" Width="64" VerticalAlignment="Center" Margin="0,0,10,0" Source="{Binding Image}"/>
-                    <TextBlock VerticalAlignment="Center" Grid.Column="1" TextAlignment="Left" x:Name="titleTextBlock" Text="{Binding Name}" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="14.667" FontWeight="Light" FontFamily="Segoe UI"/>
+                    <TextBlock VerticalAlignment="Center" Grid.Column="1" TextAlignment="Left" x:Name="titleTextBlock" Text="{Binding Name}" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="20" FontFamily="Segoe UI"/>
                 </Grid>
             </Grid>
         </DataTemplate>
