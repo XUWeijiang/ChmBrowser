@@ -9,7 +9,12 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <WebView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="webView"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ProgressBar x:Name="progressBar" Grid.Row="0" IsIndeterminate="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed"/>
+        <WebView Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="webView"/>
     </Grid>
     <Page.BottomAppBar>
         <CommandBar x:Name="commandBar">

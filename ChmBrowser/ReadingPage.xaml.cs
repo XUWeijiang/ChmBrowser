@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -51,9 +52,14 @@ namespace ChmBrowser
             {
                 args.Cancel = true;
             }
+            else
+            {
+                progressBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            }
         }
         void webView_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
         {
+            progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             _lastWebViewUrl = args.Uri;
             if (args.Uri.Scheme == "ms-local-stream")
             {
@@ -138,6 +144,7 @@ namespace ChmBrowser
                     Uri url = webView.BuildLocalStreamUri("MyTag", ChmFile.CurrentFile.Key + "/" +  ChmFile.CurrentFile.CurrentPath);
                     if (_lastWebViewUrl != url)
                     {
+                        webView.Stop();
                         webView.NavigateToLocalStreamUri(url, new ChmStreamUriTResolver());
                         ChmFile.CurrentFile.Save();
                     }
@@ -215,6 +222,12 @@ namespace ChmBrowser
                             dataWriter.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
                             dataWriter.ByteOrder = ByteOrder.LittleEndian;
                             dataWriter.WriteBytes(data);
+                            if (path.EndsWith(".htm", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
+                            {
+                                dataWriter.WriteBytes(Encoding.UTF8.GetBytes(
+                                    "<style type='text/css'>pre,ul{font-size: 300%;}</style>")
+                                    );
+                            }
                             await dataWriter.StoreAsync();
                             await dataWriter.FlushAsync();
                             dataWriter.DetachStream();

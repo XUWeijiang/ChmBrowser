@@ -192,5 +192,11 @@
   <AccountPackageIdentityNames>
     <MainPackageIdentityName>23419.45606CE70A86B</MainPackageIdentityName>
   </AccountPackageIdentityNames>
-  <PackageInfoList LandingUrl="https://dev.windowsphone.com/AppSubmission/AssociationLanding?windowsProductId=91b54d40-2734-4ba6-9ab9-c84108cd06cf" />
+  <PackageInfoList LandingUrl="https://dev.windowsphone.com/AppSubmission/AssociationLanding?windowsProductId=91b54d40-2734-4ba6-9ab9-c84108cd06cf">
+    <PackageInfo>
+      <OsMinVersion>6.3.0.0</OsMinVersion>
+      <PackageArchitecture>arm</PackageArchitecture>
+      <PackageMaxArchitectureVersion>1.1.0.1</PackageMaxArchitectureVersion>
+    </PackageInfo>
+  </PackageInfoList>
 </StoreAssociation>

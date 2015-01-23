@@ -16,8 +16,8 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Image x:Name="collapseImage" Source="Assets/collapse.png" Width="15" Height="15" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed"/>
-            <Image x:Name="expandImage" Source="Assets/expand.png" Width="15" Height="15" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed"/>
+            <!--<Image x:Name="collapseImage" Source="Assets/collapse.png" Width="15" Height="15" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed"/>
+            <Image x:Name="expandImage" Source="Assets/expand.png" Width="15" Height="15" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed"/>-->
             <TextBlock x:Name="titleTextBlock" Text="Cover" FontSize="16" Grid.Column="1" Margin="5, 0, 0, 0" Foreground="{ThemeResource ApplicationForegroundThemeBrush}"/>
         </Grid>
         <StackPanel Margin="30, 3, 0, 0" Grid.Row="1" Orientation="Vertical" x:Name="childrenSP">

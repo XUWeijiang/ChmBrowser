@@ -145,5 +145,10 @@ namespace ChmBrowser
             await FileHistory.DeleteFromHistory(info.Key);
             _history.Entries = await FileHistory.GetHistoryEntriesInfo();
         }
+
+        private void GoAbout_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(AboutPage));
+        }
     }
 }

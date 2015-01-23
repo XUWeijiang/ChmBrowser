@@ -1,0 +1,26 @@
+﻿<Page
+    x:Class="ChmBrowser.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ChmBrowser"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid Margin="20, 10, 0, 0">
+        <StackPanel>
+            <TextBlock Text="关于" FontSize="40" Margin="0, 0, 0, 0"/>
+            <TextBlock Text="CHM阅读器" FontSize="30" Margin="0, 20, 0, 0"/>
+            <TextBlock TextWrapping="WrapWholeWords" FontSize="15" Margin="20, 10, 10, 0">
+                本软件的CHM文件解析基于开源项目
+                <Hyperlink NavigateUri="http://www.sumatrapdfreader.org/" Foreground="Red">
+                    Sumatra PDF
+                </Hyperlink>，特此鸣谢。
+                
+            </TextBlock>
+            <TextBlock TextWrapping="WrapWholeWords" FontSize="15" Margin="20, 10, 10, 0" Text="基于开源规则，我也正在整理代码。整理完成后会放到Github上去。"/>
+            <Button x:Name="buttonReview" Content="到Store打分支持" Margin="20, 20, 20, 0" HorizontalAlignment="Stretch" Click="buttonReview_Click"/>
+        </StackPanel>
+    </Grid>
+</Page>
