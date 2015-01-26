@@ -27,9 +27,25 @@
             <TextBlock Text="目录" Margin="0,-6.5,0,10" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
         </StackPanel>
         <!--TODO: Content should be placed within the following grid-->
-        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
+        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,5,19,0">
             <ScrollViewer x:Name="childrenSV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <local:HierarchyNode x:Name="outlineControl"/>
+                <ItemsControl x:Name="itemsControl" ItemsSource="{Binding Topics}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsStackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.Template>
+                        <ControlTemplate>
+                            <ItemsPresenter/>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock FontSize="16" Margin="{Binding Margin}" Text="{Binding Topic}" Foreground="{Binding Fore}" Tapped="tbTopic_Tapped"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </ScrollViewer>
         </Grid>
     </Grid>

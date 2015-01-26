@@ -92,18 +92,17 @@
     <Compile Include="Common\EntryInfo.cs" />
     <Compile Include="Common\MetaInfo.cs" />
     <Compile Include="Common\NavigationHelper.cs" />
+    <Compile Include="Common\NotifyPropertyChangedBased.cs" />
     <Compile Include="Common\ObservableDictionary.cs" />
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\Snapshot.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
+    <Compile Include="Common\TopicInfo.cs" />
     <Compile Include="ContentPage.xaml.cs">
       <DependentUpon>ContentPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="ContinuationManager.cs" />
     <Compile Include="Common\FileHistory.cs" />
-    <Compile Include="HierarchyNode.xaml.cs">
-      <DependentUpon>HierarchyNode.xaml</DependentUpon>
-    </Compile>
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -147,10 +146,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ContentPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="HierarchyNode.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

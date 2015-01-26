@@ -27,30 +27,22 @@ namespace ChmBrowser
     public sealed partial class ContentPage : Page
     {
         private WeakReference<ChmCore.Chm> chmWeak_ = new WeakReference<Chm>(null);
+        private TopcisInfo _topics = new TopcisInfo();
 
         public ContentPage()
         {
             this.InitializeComponent();
+            this.DataContext = _topics;
             this.NavigationCacheMode = NavigationCacheMode.Required;
             this.Loaded += ContentPage_Loaded;
-            outlineControl.SelectedNodeChanged += outlineControl_SelectedNodeChanged;   
+            //outlineControl.SelectedNodeChanged += outlineControl_SelectedNodeChanged;   
         }
 
         void ContentPage_Loaded(object sender, RoutedEventArgs e)
         {
-            HierarchyNode node = outlineControl.LocateItem(ChmFile.CurrentFile.CurrentPath);
-            if (node != null)
-            {
-                ScrollToView(node);
-            }
+            _topics.SelectTopic(ChmFile.CurrentFile.CurrentPath);
+            ScrollToView();
         }
-
-        void outlineControl_SelectedNodeChanged(object sender, HierarchyNode e)
-        {
-            ChmFile.CurrentFile.SetCurrent(e.Data);
-            Frame.GoBack();
-        }
-
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             Chm obj;
@@ -61,30 +53,27 @@ namespace ChmBrowser
             else
             {
                 chmWeak_ = new WeakReference<Chm>(ChmFile.CurrentFile.Chm);
-                outlineControl.ShowData(ChmFile.CurrentFile.Chm.Outline, true);
+                _topics.Topics = TopcisInfo.LoadTopcisInfo(ChmFile.CurrentFile.Chm.Outline);
                 bookNameBlock.Text = ChmFile.CurrentFile.ChmMeta.GetDisplayName();
             }
         }
 
-        public void ScrollToView(HierarchyNode node)
+        public void ScrollToView()
         {
-            var transform = node.TransformToVisual(childrenSV);
-            var positionInScrollViewer = transform.TransformPoint(new Point(0, 0));
-
-            double verticalOffset = childrenSV.VerticalOffset;
-            double horizontalOffset = childrenSV.HorizontalOffset;
-
-            if (positionInScrollViewer.Y < 0 || positionInScrollViewer.Y > childrenSV.ViewportHeight)
+            if (_topics.SelectedTopic == null || _topics.Topics == null || _topics.Topics.Count == 0)
             {
-                verticalOffset = childrenSV.VerticalOffset + positionInScrollViewer.Y - 10;
+                return;
             }
-
-            if (positionInScrollViewer.X < 0 || positionInScrollViewer.X > childrenSV.ViewportWidth)
+            double expectedVerticalOffset = (double)(_topics.SelectedIndex > 0? _topics.SelectedIndex - 1: 0) / (double)_topics.Topics.Count * childrenSV.ExtentHeight;
+            double currentVerticalOffset = childrenSV.VerticalOffset;
+            if (expectedVerticalOffset > currentVerticalOffset && expectedVerticalOffset < currentVerticalOffset + childrenSV.ViewportHeight)
             {
-                horizontalOffset = childrenSV.HorizontalOffset + positionInScrollViewer.X - 10;
+                childrenSV.ChangeView(0, null, null);
             }
-
-            childrenSV.ChangeView(horizontalOffset, verticalOffset, 1);
+            else
+            {
+                childrenSV.ChangeView(0, expectedVerticalOffset, 1);
+            }
         }
 
         private void GoTop_Click(object sender, RoutedEventArgs e)
@@ -94,6 +83,12 @@ namespace ChmBrowser
         private void GoBottom_Click(object sender, RoutedEventArgs e)
         {
             childrenSV.ChangeView(0, childrenSV.ScrollableHeight, null);
+        }
+
+        private void tbTopic_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            ChmFile.CurrentFile.SetCurrent((((TextBlock)sender).DataContext as TopicInfo).Outline);
+            Frame.GoBack();
         }
     }
 }

@@ -15,18 +15,8 @@ namespace ChmBrowser.Common
         public string Name { get; set; }
         public ImageSource Image { get; set; }
     }
-    public class EntriesInfo : INotifyPropertyChanged
+    public class EntriesInfo: NotifyPropertyChangedBased
     {
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-
         private IList<EntryInfo> _entries = new List<EntryInfo>();
         public IList<EntryInfo> Entries
         {
