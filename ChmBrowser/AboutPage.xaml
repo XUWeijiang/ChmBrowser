@@ -16,11 +16,12 @@
                 本软件的CHM文件解析基于开源项目
                 <Hyperlink NavigateUri="http://www.sumatrapdfreader.org/" Foreground="Red">
                     Sumatra PDF
-                </Hyperlink>，特此鸣谢。
-                
+                </Hyperlink>，特此鸣谢。               
             </TextBlock>
             <TextBlock TextWrapping="WrapWholeWords" FontSize="15" Margin="20, 10, 10, 0" Text="基于开源规则，我也正在整理代码。整理完成后会放到Github上去。"/>
-            <Button x:Name="buttonReview" Content="到Store打分支持" Margin="20, 20, 20, 0" HorizontalAlignment="Stretch" Click="buttonReview_Click"/>
+            <TextBlock TextWrapping="WrapWholeWords" FontSize="15" Margin="20, 10, 10, 0" Text="本软件所有图标均来自网络，如果有任何版权问题，请联系我。"/>
+            <Button x:Name="buttonFeedback" Content="发送反馈" Margin="20, 20, 20, 0" HorizontalAlignment="Stretch" Click="buttonFeedback_Click"/>
+            <Button x:Name="buttonReview" Content="到Store打分支持" Margin="20, 5, 20, 0" HorizontalAlignment="Stretch" Click="buttonReview_Click"/>
         </StackPanel>
     </Grid>
 </Page>

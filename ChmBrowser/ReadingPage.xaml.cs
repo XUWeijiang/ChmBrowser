@@ -222,12 +222,12 @@ namespace ChmBrowser
                             dataWriter.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
                             dataWriter.ByteOrder = ByteOrder.LittleEndian;
                             dataWriter.WriteBytes(data);
-                            if (path.EndsWith(".htm", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
-                            {
-                                dataWriter.WriteBytes(Encoding.UTF8.GetBytes(
-                                    "<style type='text/css'>pre,ul{font-size: 300%;}</style>")
-                                    );
-                            }
+                            //if (path.EndsWith(".htm", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
+                            //{
+                            //    dataWriter.WriteBytes(Encoding.UTF8.GetBytes(
+                            //        "<style type='text/css'>pre,ul{font-size: 300%;}</style>")
+                            //        );
+                            //}
                             await dataWriter.StoreAsync();
                             await dataWriter.FlushAsync();
                             dataWriter.DetachStream();

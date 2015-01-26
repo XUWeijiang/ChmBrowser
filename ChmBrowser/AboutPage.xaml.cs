@@ -43,5 +43,14 @@ namespace ChmBrowser
             Uri reviewUri = new Uri("ms-windows-store:reviewapp?appid=14bc1f4d-39c5-410d-90b3-f6ca06e5e7b2");
             await Launcher.LaunchUriAsync(reviewUri);
         }
+
+        private async void buttonFeedback_Click(object sender, RoutedEventArgs e)
+        {
+            Windows.ApplicationModel.Email.EmailMessage mail = new Windows.ApplicationModel.Email.EmailMessage();
+            mail.Subject = "Chm阅读器反馈";
+            mail.Body = "";
+            mail.To.Add(new Windows.ApplicationModel.Email.EmailRecipient("enzohow@live.com"));
+            await Windows.ApplicationModel.Email.EmailManager.ShowComposeNewEmailAsync(mail);
+        }
     }
 }
