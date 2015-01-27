@@ -1,4 +1,6 @@
-﻿using ChmBrowser.Common;
+﻿/* Copyright 2015 XU Weijiang (weijiang.xu AT gmail.com) License: GPLv3 */
+
+using ChmBrowser.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;

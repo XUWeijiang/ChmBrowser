@@ -1,4 +1,5 @@
-﻿<Page
+﻿<!-- Copyright 2015 XU Weijiang (weijiang.xu AT gmail.com) License: GPLv3 -->
+<Page
     x:Class="ChmBrowser.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

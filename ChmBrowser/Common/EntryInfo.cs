@@ -1,4 +1,6 @@
-﻿using System;
+﻿/* Copyright 2015 XU Weijiang (weijiang.xu AT gmail.com) License: GPLv3 */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
