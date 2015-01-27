@@ -1,5 +1,8 @@
 /* Copyright 2014 the SumatraPDF project authors (see AUTHORS file).
    License: Simplified BSD (see COPYING.BSD) */
+
+/*Minor modified by XU Weijiang (weijiang.xu AT gmail.com) for Windows RT*/
+
 #include "pch.h"
 
 #include "BaseUtil.h"

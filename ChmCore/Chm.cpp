@@ -1,4 +1,5 @@
-﻿// Class1.cpp
+﻿/* Copyright 2015 XU Weijiang (weijiang.xu AT gmail.com) and the SumatraPDF project authors (because part of the code is copied from them) License: GPLv3 */
+
 #include "pch.h"
 #include "Chm.h"
 #include "ChmDoc.h"

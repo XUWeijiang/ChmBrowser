@@ -48,6 +48,9 @@
  *                                                                         *
  ***************************************************************************/
 
+/*
+ * Minor modified by XU Weijiang (weijiang.xu AT gmail.com) for Windows RT.
+*/
 #include "pch.h"
 
 #include "chm_lib.h"

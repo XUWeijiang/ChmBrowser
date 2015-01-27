@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿/* Copyright 2015 XU Weijiang (weijiang.xu AT gmail.com) License: GPLv3 */
+
+#pragma once
 #include <windows.h>
 #include <collection.h>
 #include "ChmDoc.h"

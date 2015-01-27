@@ -175,6 +175,10 @@ namespace ChmBrowser.Common
                 ret.Chm = new ChmCore.Chm(file.Path);
                 ret.ChmMeta = await MetaInfo.ReadMetaInfo(key);
                 ret.HasThumbnail = await Snapshot.HasSnapshot(key);
+                if (ret.Chm.Title != null)
+                {
+                    ret.ChmMeta.SetDisplayName(ret.Chm.Title);
+                }
                 //try
                 //{
                 //    Windows.UI.Xaml.Media.Imaging.BitmapImage image = new Windows.UI.Xaml.Media.Imaging.BitmapImage();

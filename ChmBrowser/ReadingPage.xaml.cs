@@ -225,7 +225,7 @@ namespace ChmBrowser
                             //if (path.EndsWith(".htm", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
                             //{
                             //    dataWriter.WriteBytes(Encoding.UTF8.GetBytes(
-                            //        "<style type='text/css'>pre,ul{font-size: 300%;}</style>")
+                            //        "<style type='text/css'>pre,ul,table tr td:first-child{font-size: 250%;}</style>")
                             //        );
                             //}
                             await dataWriter.StoreAsync();
@@ -236,5 +236,9 @@ namespace ChmBrowser
                     }
                 });
         }
+        //private static bool IsHtml(string path)
+        //{
+        //    return path.EndsWith(".htm", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".html", StringComparison.OrdinalIgnoreCase);
+        //}
     }
 }

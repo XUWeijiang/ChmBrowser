@@ -93,6 +93,14 @@ namespace ChmBrowser
             }
             else
             {
+                // update old name (created by older version) when open file.
+                foreach(var entry in _history.Entries)
+                {
+                    if (entry.Key == info.Key)
+                    {
+                        entry.Name = ChmFile.CurrentFile.ChmMeta.GetDisplayName(); 
+                    }
+                }
                 Frame.Navigate(typeof(ReadingPage));
             }
         }

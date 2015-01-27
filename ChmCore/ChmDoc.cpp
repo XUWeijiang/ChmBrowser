@@ -1,5 +1,8 @@
 /* Copyright 2014 the SumatraPDF project authors (see AUTHORS file).
    License: GPLv3 */
+/*
+* Minor modified by XU Weijiang (weijiang.xu AT gmail.com)
+*/
 #include "pch.h"
 
 // utils
@@ -219,6 +222,16 @@ bool ChmDoc::Load(const WCHAR *fileName)
     chmHandle = chm_open((WCHAR *)fileName);
     if (!chmHandle)
         return false;
+    
+    char header[24] = { 0 };
+    if (file::ReadN(fileName, header, sizeof(header))) {
+        DWORD lcid = ByteReader(header, sizeof(header)).DWordLE(20);
+        codepage = LcidToCodepage(lcid);
+        if (codepage == CP_CHM_DEFAULT)
+        {
+            codepage = 0; // give away the chance of setting codepage, so the following can set codepage.
+        }
+    }
 
     ParseWindowsData();
     if (!ParseSystemData())
@@ -237,13 +250,7 @@ bool ChmDoc::Load(const WCHAR *fileName)
         return false;
 
     if (!codepage) {
-        char header[24] = { 0 };
-        if (file::ReadN(fileName, header, sizeof(header))) {
-            DWORD lcid = ByteReader(header, sizeof(header)).DWordLE(20);
-            codepage = LcidToCodepage(lcid);
-        }
-        else
-            codepage = CP_CHM_DEFAULT;
+        codepage = CP_CHM_DEFAULT; 
     }
     //if (GetACP() == codepage)
     //    codepage = CP_ACP;
