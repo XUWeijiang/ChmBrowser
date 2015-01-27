@@ -184,7 +184,13 @@ namespace ChmBrowser
                     throw new Exception("Failed to create initial page");
                 }
             }
-
+            else if (!string.IsNullOrEmpty(e.Arguments))
+            {
+                if (!rootFrame.Navigate(typeof(MainPage), e.Arguments)) // renavigate to mainpage, which will redirect to readingpage (in OnNavigateTo).
+                {
+                    throw new Exception("Failed to create initial page");
+                }
+            }
             // Ensure the current window is active
             Window.Current.Activate();
         }

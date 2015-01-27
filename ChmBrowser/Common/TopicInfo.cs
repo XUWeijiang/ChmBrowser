@@ -84,6 +84,8 @@ namespace ChmBrowser.Common
             {
                 if (_entries != value)
                 {
+                    _selectedIndex = 0;
+                    _selectedTopic = null;
                     _entries = value;
                     this.OnPropertyChanged("Topics");
                 }

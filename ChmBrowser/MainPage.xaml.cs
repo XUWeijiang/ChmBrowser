@@ -19,6 +19,8 @@ using ChmCore;
 using Windows.UI.Popups;
 using ChmBrowser.Common;
 using Microsoft.Live;
+using Windows.UI.StartScreen;
+using System.Threading.Tasks;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
 
@@ -44,8 +46,16 @@ namespace ChmBrowser
         /// This parameter is typically used to configure the page.</param>
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            _history.Entries = await FileHistory.GetHistoryEntriesInfo();
-
+            if (e.NavigationMode == NavigationMode.New && e.Parameter != null && !string.IsNullOrEmpty(e.Parameter.ToString()))
+            {
+                Frame.BackStack.Clear(); // a new start...
+                await OpenLocalChmFile(e.Parameter.ToString()); // Navigate to ReadingPage
+            }
+            else
+            {
+                _history.Entries = await FileHistory.GetHistoryEntriesInfo(); // stay in this page.
+            }
+            
             // TODO: Prepare page for display here.
 
             // TODO: If your application contains multiple pages, ensure that you are
@@ -84,11 +94,16 @@ namespace ChmBrowser
         private async void ItemGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             EntryInfo info = e.ClickedItem as EntryInfo;
-            bool success = await ChmFile.OpenLocalChmFile(info);
+            await OpenLocalChmFile(info.Key);
+        }
+
+        private async Task OpenLocalChmFile(string key)
+        {
+            bool success = await ChmFile.OpenLocalChmFile(key);
 
             if (!success) // failed
             {
-                MessageDialog msg = new MessageDialog(string.Format("{0}: Invalid File", info.Key));
+                MessageDialog msg = new MessageDialog(string.Format("{0}: Invalid File", key));
                 await msg.ShowAsync();
             }
             else
@@ -96,7 +111,7 @@ namespace ChmBrowser
                 // update old name (created by older version) when open file.
                 foreach(var entry in _history.Entries)
                 {
-                    if (entry.Key == info.Key)
+                    if (entry.Key == key)
                     {
                         entry.Name = ChmFile.CurrentFile.ChmMeta.GetDisplayName(); 
                     }
@@ -109,6 +124,15 @@ namespace ChmBrowser
         {
             if (e.HoldingState == Windows.UI.Input.HoldingState.Started)
             {
+                EntryInfo info = ((FrameworkElement)sender).DataContext as EntryInfo;
+                if (Windows.UI.StartScreen.SecondaryTile.Exists(info.Key))
+                {
+                    pinItem.Text = "从开始屏幕删除";
+                }
+                else
+                {
+                    pinItem.Text = "固定到开始屏幕";
+                }
                 FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
             }
         }
@@ -151,9 +175,30 @@ namespace ChmBrowser
         {
             EntryInfo info = ((FrameworkElement)sender).DataContext as EntryInfo;
             await FileHistory.DeleteFromHistory(info.Key);
+            if (Windows.UI.StartScreen.SecondaryTile.Exists(info.Key))
+            {
+                SecondaryTile st = new SecondaryTile(info.Key);
+                await st.RequestDeleteAsync();
+            }
             _history.Entries = await FileHistory.GetHistoryEntriesInfo();
         }
-
+        private async void pinItem_Click(object sender, RoutedEventArgs e)
+        {
+            EntryInfo info = ((FrameworkElement)sender).DataContext as EntryInfo;
+            if (Windows.UI.StartScreen.SecondaryTile.Exists(info.Key))
+            {
+                SecondaryTile st = new SecondaryTile(info.Key);
+                await st.RequestDeleteAsync();
+            }
+            else
+            {
+                Uri square150x150Logo = new Uri("ms-appx:///Assets/tile.png");
+                SecondaryTile st = new SecondaryTile(info.Key, info.Name, info.Key, square150x150Logo, TileSize.Square150x150);
+                st.VisualElements.ShowNameOnSquare150x150Logo = true;
+                st.RoamingEnabled = false;
+                await st.RequestCreateAsync();
+            }
+        }
         private void GoAbout_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(AboutPage));

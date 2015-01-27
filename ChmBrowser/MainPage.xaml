@@ -9,7 +9,8 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <Page.Resources>
         <MenuFlyout x:Key="itemMenuFlyout">
-            <MenuFlyoutItem Text="删除" DataContext="{Binding}" Click="deleteItem_Click"/>
+            <MenuFlyoutItem x:Name="deleteItem" Text="删除" DataContext="{Binding}" Click="deleteItem_Click"/>
+            <MenuFlyoutItem x:Name="pinItem" Text="固定到开始屏幕" DataContext="{Binding}" Click="pinItem_Click"/>
         </MenuFlyout>
         <DataTemplate x:Key="GridViewItemTemplate">
             <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
