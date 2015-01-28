@@ -224,6 +224,8 @@ namespace ChmBrowser.Common
         public string Key { get; private set; }
         public bool HasThumbnail { get; private set; }
 
+        private bool _isSaving = false;
+
         public async Task CreateThumbnailFile(Func<IRandomAccessStream, Task> create)
         {
             if (await Snapshot.CreateSnapshot(Key, create))
@@ -233,9 +235,12 @@ namespace ChmBrowser.Common
             }
         }
 
-        public async void Save()
+        public async Task Save()
         {
+            if (_isSaving) { return; } // cancel save
+            _isSaving = true;
             await ChmMeta.SaveMetaInfo(Key);
+            _isSaving = false;
         }
 
         public bool SetNext()

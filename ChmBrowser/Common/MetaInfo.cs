@@ -56,6 +56,11 @@ namespace ChmBrowser.Common
             SetMeta("path", path);
         }
 
+        public void SetScale(string scale)
+        {
+            SetMeta("scale", scale);
+        }
+
         public string GetLast()
         {
             return GetMeta("last");
@@ -69,6 +74,17 @@ namespace ChmBrowser.Common
         public string GetOriginalPath()
         {
             return GetMeta("path");
+        }
+
+        // Negtive means auto
+        public string GetScale()
+        {
+            string scale = GetMeta("scale");
+            if (string.IsNullOrEmpty(scale))
+            {
+                scale = "-1";
+            }
+            return scale;
         }
 
         public async Task SaveMetaInfo(IStorageFile file)
