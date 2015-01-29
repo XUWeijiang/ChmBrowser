@@ -48,9 +48,9 @@ namespace ChmBrowser
         /// This parameter is typically used to configure the page.</param>
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
+            Frame.BackStack.Clear(); // a new start...
             if (e.NavigationMode == NavigationMode.New && e.Parameter != null && !string.IsNullOrEmpty(e.Parameter.ToString()))
             {
-                Frame.BackStack.Clear(); // a new start...
                 await OpenLocalChmFile(e.Parameter.ToString()); // Navigate to ReadingPage
             }
             else
