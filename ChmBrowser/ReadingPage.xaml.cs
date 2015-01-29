@@ -99,11 +99,11 @@ namespace ChmBrowser
         async void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
         {
             e.Handled = true;
-            if (settingRoot.Visibility == Windows.UI.Xaml.Visibility.Visible)
+            if (commandBar.Visibility == Windows.UI.Xaml.Visibility.Collapsed)
             {
                 commandBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                settingRoot.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                root.Children.Remove(settingRoot);
                 await ChmFile.CurrentFile.Save();
             }
             else
@@ -130,8 +130,8 @@ namespace ChmBrowser
             await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().HideAsync();
             HardwareButtons.BackPressed += HardwareButtons_BackPressed;
             commandBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            settingRoot.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            root.Children.Remove(settingRoot);
 
             if (!ChmFile.CurrentFile.HasOutline)
             {
@@ -217,8 +217,8 @@ namespace ChmBrowser
         }
         private void GoSetting_Click(object sender, RoutedEventArgs e)
         {
-            commandBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            settingRoot.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            root.Children.Add(settingRoot);
+            commandBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;     
             progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
         }
         private async Task SetScale(string value)
@@ -337,7 +337,9 @@ namespace ChmBrowser
         {
             return Encoding.UTF8.GetBytes
             ("<style type='text/css'>*{-ms-text-size-adjust:"+ _scale + ";}</style>" +
-            "<script type='text/javascript'>function setScale(scale){document.styleSheets[document.styleSheets.length - 1].rules[0].style.cssText='-ms-text-size-adjust:'+scale;}</script>"
+            "<script type='text/javascript'>function setScale(scale){document.styleSheets[document.styleSheets.length - 1].rules[0].style.cssText='-ms-text-size-adjust:'+scale +';';" + 
+            "var i,frames;frames=document.getElementsByTagName('iframe');for(i=0;i<frames.length; ++i){if(frames[i].contentWindow&&frames[i].contentWindow.setScale){frames[i].contentWindow.setScale(scale);}}" + 
+            "}</script>"
             );
         }
 
