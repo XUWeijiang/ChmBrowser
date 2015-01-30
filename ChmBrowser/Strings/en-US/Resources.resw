@@ -127,7 +127,7 @@
     <value>.</value>
   </data>
   <data name="AppName" xml:space="preserve">
-    <value>CHM Viewer</value>
+    <value>CHM Reader</value>
   </data>
   <data name="AutoZoom.Header" xml:space="preserve">
     <value>auto zoom</value>
@@ -169,7 +169,7 @@
     <value>{0}: invalid file</value>
   </data>
   <data name="MailSubject" xml:space="preserve">
-    <value>Feedback for CHM Viewer</value>
+    <value>Feedback for CHM Reader</value>
   </data>
   <data name="MenuItemDelete.Text" xml:space="preserve">
     <value>delete</value>
@@ -202,7 +202,7 @@
     <value>settings...</value>
   </data>
   <data name="Title.Text" xml:space="preserve">
-    <value>CHM Viewer</value>
+    <value>CHM Reader</value>
   </data>
   <data name="Top.Label" xml:space="preserve">
     <value>top</value>

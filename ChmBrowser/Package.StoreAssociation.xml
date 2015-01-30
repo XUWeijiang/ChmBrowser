@@ -187,6 +187,7 @@
     <MainPackageIdentityName>23419.CHM</MainPackageIdentityName>
     <ReservedNames>
       <ReservedName>CHM阅读器</ReservedName>
+      <ReservedName>CHM Reader</ReservedName>
     </ReservedNames>
   </ProductReservedInfo>
   <AccountPackageIdentityNames>
@@ -196,7 +197,7 @@
     <PackageInfo>
       <OsMinVersion>6.3.0.0</OsMinVersion>
       <PackageArchitecture>arm</PackageArchitecture>
-      <PackageMaxArchitectureVersion>1.1.0.4</PackageMaxArchitectureVersion>
+      <PackageMaxArchitectureVersion>2.0.0.0</PackageMaxArchitectureVersion>
     </PackageInfo>
   </PackageInfoList>
 </StoreAssociation>

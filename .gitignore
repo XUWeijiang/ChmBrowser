@@ -10,4 +10,5 @@ ARM/
 Release/
 bin/
 Debug/
+BundleArtifacts/
 ipch/
