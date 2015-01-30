@@ -83,7 +83,7 @@ namespace ChmBrowser
 
                 if (!success) // failed
                 {
-                    MessageDialog msg = new MessageDialog(string.Format("{0}: Invalid File", args.Files[0].Path));
+                    MessageDialog msg = new MessageDialog(string.Format(App.Localizer.GetString("InvalidFile"), args.Files[0].Path));
                     await msg.ShowAsync();
                 }
                 else
@@ -105,7 +105,7 @@ namespace ChmBrowser
 
             if (!success) // failed
             {
-                MessageDialog msg = new MessageDialog(string.Format("{0}: Invalid File", key));
+                MessageDialog msg = new MessageDialog(string.Format(App.Localizer.GetString("InvalidFile"), key));
                 await msg.ShowAsync();
             }
             else
@@ -129,11 +129,11 @@ namespace ChmBrowser
                 EntryInfo info = ((FrameworkElement)sender).DataContext as EntryInfo;
                 if (Windows.UI.StartScreen.SecondaryTile.Exists(info.Key))
                 {
-                    pinItem.Text = "从开始屏幕删除";
+                    pinItem.Text = App.Localizer.GetString("Unpin/Text");
                 }
                 else
                 {
-                    pinItem.Text = "固定到开始屏幕";
+                    pinItem.Text = App.Localizer.GetString("Pin/Text");
                 }
                 FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
             }

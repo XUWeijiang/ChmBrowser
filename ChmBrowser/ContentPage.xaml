@@ -24,8 +24,8 @@
 
         <!-- Title Panel -->
         <StackPanel Grid.Row="0" Margin="19,0,0,0">
-            <TextBlock Text="CHM阅读器" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0" x:Name="bookNameBlock" TextWrapping="WrapWholeWords"/>
-            <TextBlock Text="目录" Margin="0,-6.5,0,10" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
+            <TextBlock x:Uid="Title" Text="CHM阅读器" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0" x:Name="bookNameBlock" TextWrapping="WrapWholeWords"/>
+            <TextBlock x:Uid="Contents" Text="目录" Margin="0,-6.5,0,10" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
         </StackPanel>
         <!--TODO: Content should be placed within the following grid-->
         <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,5,19,0">
@@ -53,9 +53,9 @@
     <Page.BottomAppBar>
         <CommandBar ClosedDisplayMode="Minimal">
             <CommandBar.PrimaryCommands>
-                <AppBarButton Label="顶部" Click="GoTop_Click"  Icon="Upload">
+                <AppBarButton x:Uid="Top" Label="顶部" Click="GoTop_Click"  Icon="Upload">
                 </AppBarButton>
-                <AppBarButton Label="底部" Click="GoBottom_Click" Icon="Download">
+                <AppBarButton x:Uid="Bottom" Label="底部" Click="GoBottom_Click" Icon="Download">
                 </AppBarButton>
             </CommandBar.PrimaryCommands>
         </CommandBar>

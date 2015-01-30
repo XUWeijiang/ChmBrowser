@@ -9,6 +9,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Resources;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Phone.UI.Input;
@@ -30,6 +31,8 @@ namespace ChmBrowser
     /// </summary>
     public sealed partial class App : Application
     {
+        public static ResourceLoader Localizer = new ResourceLoader();
+
         private TransitionCollection transitions;
         public ContinuationManager ContinuationManager { get; private set; }
         /// <summary>

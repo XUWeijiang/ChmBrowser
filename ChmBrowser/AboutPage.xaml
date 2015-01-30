@@ -11,18 +11,19 @@
 
     <Grid Margin="20, 10, 0, 0">
         <StackPanel>
-            <TextBlock Text="关于" FontSize="40" Margin="0, 0, 0, 0"/>
-            <TextBlock Text="CHM阅读器" FontSize="30" Margin="0, 20, 0, 0"/>
+            <TextBlock x:Uid="About" Text="关于" FontSize="40" Margin="0, 0, 0, 0"/>
+            <TextBlock x:Uid="Title" Text="CHM阅读器" FontSize="30" Margin="0, 20, 0, 0"/>
             <TextBlock TextWrapping="WrapWholeWords" FontSize="15" Margin="20, 10, 10, 0">
-                本软件的CHM文件解析基于开源项目
+                <Run x:Uid="BeforePDFLink" Text="本软件的CHM文件解析基于开源项目"/>
                 <Hyperlink NavigateUri="http://www.sumatrapdfreader.org/" Foreground="Red">
                     Sumatra PDF
-                </Hyperlink>，特此鸣谢。               
+                </Hyperlink>
+                <Run x:Uid="AfterPDFLink" Text="，特此鸣谢。"/>
             </TextBlock>
-            <TextBlock TextWrapping="WrapWholeWords" FontSize="15" Margin="20, 10, 10, 0" Text="基于开源规则，我也正在整理代码。整理完成后会放到Github上去。"/>
-            <TextBlock TextWrapping="WrapWholeWords" FontSize="15" Margin="20, 10, 10, 0" Text="本软件所有图标均来自网络，如果有任何版权问题，请联系我。"/>
-            <Button x:Name="buttonFeedback" Content="发送反馈" Margin="20, 20, 20, 0" HorizontalAlignment="Stretch" Click="buttonFeedback_Click"/>
-            <Button x:Name="buttonReview" Content="到Store打分支持" Margin="20, 5, 20, 0" HorizontalAlignment="Stretch" Click="buttonReview_Click"/>
+            <TextBlock x:Uid="OpenSource" TextWrapping="WrapWholeWords" FontSize="15" Margin="20, 10, 10, 0" Text="基于开源规则，我也正在整理代码。整理完成后会放到Github上去。"/>
+            <TextBlock x:Uid="IconStatement" TextWrapping="WrapWholeWords" FontSize="15" Margin="20, 10, 10, 0" Text="本软件所有图标均来自网络，如果有任何版权问题，请联系我。"/>
+            <Button x:Uid="SendFeedback" x:Name="buttonFeedback" Content="发送反馈" Margin="20, 20, 20, 0" HorizontalAlignment="Stretch" Click="buttonFeedback_Click"/>
+            <Button x:Uid="Rating" x:Name="buttonReview" Content="到Store打分支持" Margin="20, 5, 20, 0" HorizontalAlignment="Stretch" Click="buttonReview_Click"/>
         </StackPanel>
     </Grid>
 </Page>

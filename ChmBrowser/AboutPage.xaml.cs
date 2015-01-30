@@ -49,7 +49,7 @@ namespace ChmBrowser
         private async void buttonFeedback_Click(object sender, RoutedEventArgs e)
         {
             Windows.ApplicationModel.Email.EmailMessage mail = new Windows.ApplicationModel.Email.EmailMessage();
-            mail.Subject = "Chm阅读器反馈";
+            mail.Subject = App.Localizer.GetString("MailSubject");
             mail.Body = "";
             mail.To.Add(new Windows.ApplicationModel.Email.EmailRecipient("enzohow@live.com"));
             await Windows.ApplicationModel.Email.EmailManager.ShowComposeNewEmailAsync(mail);

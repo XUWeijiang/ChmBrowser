@@ -10,7 +10,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <Page.Resources>
         <MenuFlyout x:Key="itemMenuFlyout">
-            <MenuFlyoutItem x:Name="deleteItem" Text="删除" DataContext="{Binding}" Click="deleteItem_Click"/>
+            <MenuFlyoutItem x:Uid="MenuItemDelete" x:Name="deleteItem" Text="删除" DataContext="{Binding}" Click="deleteItem_Click"/>
             <MenuFlyoutItem x:Name="pinItem" Text="固定到开始屏幕" DataContext="{Binding}" Click="pinItem_Click"/>
         </MenuFlyout>
         <DataTemplate x:Key="GridViewItemTemplate">
@@ -40,8 +40,8 @@
         </Grid.RowDefinitions>
         <!-- Title Panel -->
         <StackPanel Grid.Row="0" Margin="19,0,0,0">
-            <TextBlock Text="CHM阅读器" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
-            <TextBlock Text="书架" Margin="0,-6.5,0,10" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
+            <TextBlock x:Uid="Title" Text="CHM阅读器" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
+            <TextBlock x:Uid="Bookshelf" Text="书架" Margin="0,-6.5,0,10" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
         </StackPanel>
         <ScrollViewer Grid.Row="1">
             <Grid>
@@ -69,7 +69,7 @@
                         </Style>
                     </GridView.ItemContainerStyle>
                 </GridView>
-                <TextBlock Grid.Row="1" Text="浏览" Style="{ThemeResource SubheaderTextBlockStyle}" FontSize="20" Margin="5"/>
+                <TextBlock x:Uid="Browse" Grid.Row="1" Text="浏览" Style="{ThemeResource SubheaderTextBlockStyle}" FontSize="20" Margin="10"/>
                 <Grid Grid.Row="2" x:Name="ContentRoot">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -78,7 +78,7 @@
                     <Button Grid.Column="0" x:Name="browseButton" Width="128" Height="128" BorderThickness="0" Click="Button_Click">
                         <Grid>
                             <Image Source="Assets/local.png"/>
-                            <TextBlock Text="手机" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="15" Margin="3" Foreground="White"/>
+                            <TextBlock x:Uid="Phone" Text="手机" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="15" Margin="3" Foreground="White"/>
                         </Grid>
                     </Button>
                     <Button Grid.Column="1" x:Name="oneDriveButton" Width="128" Height="128" BorderThickness="0" Click="oneDriveButton_Click">
@@ -94,7 +94,7 @@
     <Page.BottomAppBar>
         <CommandBar ClosedDisplayMode="Minimal">
             <CommandBar.PrimaryCommands>
-                <AppBarButton Label="关于" Click="GoAbout_Click"  Icon="Link">
+                <AppBarButton x:Uid="AboutButton" Label="关于" Click="GoAbout_Click"  Icon="Link">
                 </AppBarButton>
             </CommandBar.PrimaryCommands>
         </CommandBar>
