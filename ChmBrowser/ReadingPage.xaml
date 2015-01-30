@@ -30,8 +30,8 @@
             </Grid.RowDefinitions>
             <TextBlock x:Uid="PageZoom" Grid.Row="0" Text="页面缩放" Margin="0, 0, 0, 15" Style="{ThemeResource SubheaderTextBlockStyle}"/>
             <ToggleSwitch x:Uid="AutoZoom" x:Name="isAutoZoom" Grid.Row="1" Header="自动缩放" OnContent="开启" OffContent="关闭"/>
-            <Slider x:Name="scaleSlider" Grid.Row="2" Margin="0, 0, 10, 0" HorizontalAlignment="Stretch" Value="1" Height="50" Minimum="0.1" Maximum="8" StepFrequency="0.1" SnapsTo="StepValues"/>
-            <TextBlock Grid.Row="3" Margin="0, -10, 10, 20" x:Name="zoomIndicator" HorizontalAlignment="Center" Text="auto"/>
+            <TextBlock Grid.Row="2" Margin="0, 0, 10, 0" x:Name="zoomIndicator" HorizontalAlignment="Center" Text="auto"/>
+            <Slider x:Name="scaleSlider" Grid.Row="3" Margin="0, -10, 10, 0" HorizontalAlignment="Stretch" Value="1" Height="50" Minimum="0.1" Maximum="8" StepFrequency="0.1" SnapsTo="StepValues"/>
         </Grid>
         <WebView Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="webView"/>
     </Grid>
