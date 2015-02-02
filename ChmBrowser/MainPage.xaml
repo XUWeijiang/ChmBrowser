@@ -35,15 +35,17 @@
         </Grid.ChildrenTransitions>
 
         <Grid.RowDefinitions>
+            <RowDefinition Height="2"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <ProgressBar x:Name="progressBar" Grid.Row="0" IsIndeterminate="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed"/>
         <!-- Title Panel -->
-        <StackPanel Grid.Row="0" Margin="19,0,0,0">
+        <StackPanel Grid.Row="1" Margin="19,0,0,0">
             <TextBlock x:Uid="Title" Text="CHM阅读器" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
             <TextBlock x:Uid="Bookshelf" Text="书架" Margin="0,-6.5,0,10" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
         </StackPanel>
-        <ScrollViewer Grid.Row="1">
+        <ScrollViewer Grid.Row="2">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>

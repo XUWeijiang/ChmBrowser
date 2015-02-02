@@ -48,6 +48,7 @@ namespace ChmBrowser
         /// This parameter is typically used to configure the page.</param>
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
+            progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             Frame.BackStack.Clear(); // a new start...
             if (e.NavigationMode == NavigationMode.New && e.Parameter != null && !string.IsNullOrEmpty(e.Parameter.ToString()))
             {
@@ -79,8 +80,9 @@ namespace ChmBrowser
         {
             if (args.Files.Count > 0)
             {
+                progressBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
                 bool success = await ChmFile.OpenChmFileFromPhone(args.Files[0]);
-
+                progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 if (!success) // failed
                 {
                     MessageDialog msg = new MessageDialog(string.Format(App.Localizer.GetString("InvalidFile"), args.Files[0].Path));
