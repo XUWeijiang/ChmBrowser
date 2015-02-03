@@ -9,19 +9,15 @@ using namespace Platform;
 
 class EbookTocExtractor : public EbookTocVisitor{
 private:
-    std::stack<ChmOutline^> topics_stack_;
-    std::stack<int> topics_level_stack_;
-    ChmOutline^ root_;
+    Windows::Foundation::Collections::IVector<ChmTopic^>^ contents_;
 public:
     EbookTocExtractor()
     {
-        root_ = ref new ChmOutline("", "", nullptr);
-        topics_stack_.push(root_);
-        topics_level_stack_.push(0);
+        contents_ = ref new Platform::Collections::Vector<ChmTopic^>();
     }
-    ChmOutline^ GetOutline()
+    Windows::Foundation::Collections::IVector<ChmTopic^>^ GetContents()
     {
-        return root_;
+        return contents_;
     }
 public:
     virtual void Visit(const WCHAR *name, const WCHAR *url, int level) override
@@ -30,28 +26,11 @@ public:
         {
             return;
         }
-        while (!topics_stack_.empty() && topics_level_stack_.top() >= level)
-        {
-            topics_stack_.pop();
-            topics_level_stack_.pop();
-        }
-        if (topics_stack_.empty())
-        {
-            topics_stack_.push(root_);
-            topics_level_stack_.push(0);
-        }
-        while (*url == '/') // trim backslash.
-        {
-            url++;
-        }
-        auto x = topics_stack_.top();
-        ChmOutline^ newOutline = ref new ChmOutline(
+        ChmTopic^ newTopic = ref new ChmTopic(
             ref new Platform::String(name), 
             ref new Platform::String(url), 
-            x);
-        x->SubSections->Append(newOutline);
-        topics_stack_.push(newOutline);
-        topics_level_stack_.push(level);
+            level);
+        contents_->Append(newTopic);
     }
 };
 
@@ -67,11 +46,11 @@ Chm::Chm(Platform::String^ file)
     {
         EbookTocExtractor holder;
         doc_->ParseToc(&holder);
-        Outline = holder.GetOutline();
+        Contents = holder.GetContents();
     }
     catch (...)
     {
-        Outline = nullptr;
+        Contents = nullptr;
     }
     WCHAR* title = doc_->GetProperty(DocumentProperty::Prop_Title);
     if (title != nullptr)
@@ -98,15 +77,12 @@ Platform::Array<byte>^ Chm::GetData(Platform::String^ path)
     ScopedMem<WCHAR> plainUrl(url::GetFullPath(path->Data()));
     size_t length;
     ScopedMem<char> urlUtf8(str::conv::ToUtf8(plainUrl));
-    unsigned char* data = doc_->GetData(urlUtf8, &length);
-    if (data == nullptr)
-    {
-        return ref new Platform::Array<byte>(0);
-    }
-    else
+    ScopedMem<unsigned char> data(doc_->GetData(urlUtf8, &length));
+    if (data != nullptr)
     {
         return ref new Platform::Array<byte>(data, length);
     }
+    return nullptr;
 }
 bool Chm::HasData(Platform::String^ path)
 {

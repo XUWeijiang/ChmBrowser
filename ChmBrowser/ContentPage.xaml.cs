@@ -55,7 +55,7 @@ namespace ChmBrowser
             else
             {
                 chmWeak_ = new WeakReference<Chm>(ChmFile.CurrentFile.Chm);
-                _topics.Topics = TopcisInfo.LoadTopcisInfo(ChmFile.CurrentFile.Chm.Outline);
+                _topics.RefreshTopcisInfo();
                 bookNameBlock.Text = ChmFile.CurrentFile.ChmMeta.GetDisplayName();
             }
         }
@@ -87,9 +87,9 @@ namespace ChmBrowser
             childrenSV.ChangeView(0, childrenSV.ScrollableHeight, null);
         }
 
-        private void tbTopic_Tapped(object sender, TappedRoutedEventArgs e)
+        private async void tbTopic_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            ChmFile.CurrentFile.SetCurrent((((TextBlock)sender).DataContext as TopicInfo).Outline);
+            await ChmFile.CurrentFile.SetCurrent((((TextBlock)sender).DataContext as TopicInfo).TopicId);
             Frame.GoBack();
         }
     }

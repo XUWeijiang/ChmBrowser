@@ -44,7 +44,6 @@ namespace ChmBrowser
             webView.NavigationStarting += webView_NavigationStarting;
             scaleSlider.ValueChanged += scaleSlider_ValueChanged;
             isAutoZoom.Toggled += isAutoZoom_Toggled;
-            Application.Current.Suspending += Current_Suspending;
         }
 
         async void Current_Suspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
@@ -122,14 +121,17 @@ namespace ChmBrowser
         /// This parameter is typically used to configure the page.</param>
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
+            HardwareButtons.BackPressed += HardwareButtons_BackPressed;
+            Application.Current.Suspending += Current_Suspending;
+
             scaleSlider.ValueChanged -= scaleSlider_ValueChanged;
             isAutoZoom.Toggled -= isAutoZoom_Toggled;
             ResetSetting();
             scaleSlider.ValueChanged += scaleSlider_ValueChanged;
             isAutoZoom.Toggled += isAutoZoom_Toggled;
-
+            
             await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().HideAsync();
-            HardwareButtons.BackPressed += HardwareButtons_BackPressed;
+
             commandBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
             progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             root.Children.Remove(settingRoot);
@@ -155,6 +157,9 @@ namespace ChmBrowser
 
         protected async override void OnNavigatedFrom(NavigationEventArgs e)
         {
+            HardwareButtons.BackPressed -= HardwareButtons_BackPressed;
+            Application.Current.Suspending -= Current_Suspending;
+
             if (e.SourcePageType == typeof(ContentPage))
             {
                 NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Required;
@@ -163,7 +168,7 @@ namespace ChmBrowser
             {
                 NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Disabled;
             }
-            HardwareButtons.BackPressed -= HardwareButtons_BackPressed;
+            
             await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().ShowAsync();
             base.OnNavigatedFrom(e);
         }
@@ -175,14 +180,14 @@ namespace ChmBrowser
 
         private async void Next_Click(object sender, RoutedEventArgs e)
         {
-            if (ChmFile.CurrentFile.SetNext())
+            if (await ChmFile.CurrentFile.SetNext())
             {
                 await UpdateReading();
             }
         }
         private async void Previous_Click(object sender, RoutedEventArgs e)
         {
-            if (ChmFile.CurrentFile.SetPrevious())
+            if (await ChmFile.CurrentFile.SetPrevious())
             {
                 await UpdateReading();
             }

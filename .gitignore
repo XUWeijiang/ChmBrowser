@@ -4,6 +4,7 @@
 *.suo
 *.sdf
 *.obj
+*.diagsession
 obj/
 AppPackages/
 ARM/

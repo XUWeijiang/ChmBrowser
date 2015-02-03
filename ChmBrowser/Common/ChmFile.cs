@@ -36,11 +36,6 @@ namespace ChmBrowser.Common
                     FileHistory.UpdateHistoryWhenOpenFile(value.Key);
                     if (_currentFile != null)
                     {
-                        if (_currentFile.Current != null)
-                        {
-                            _currentFile.Current = null;
-                        }
-
                         if (_currentFile.Chm != null)
                         {
                             _currentFile.Chm.Dispose();
@@ -221,11 +216,12 @@ namespace ChmBrowser.Common
 
         private ChmFile()
         {
+            Current = 0;
         }
 
         public Chm Chm { get; private set; }
-        private ChmOutline Current { get; set; }
-        public bool HasOutline { get { return Chm.Outline != null && Chm.Outline.SubSections != null && Chm.Outline.SubSections.Count > 0; } }
+        private int Current { get; set; }
+        public bool HasOutline { get { return Chm.Contents != null && Chm.Contents.Count > 0; } }
         public string CurrentPath { get; private set; }
         public MetaInfo ChmMeta { get; private set; }
         public string Key { get; private set; }
@@ -275,47 +271,57 @@ namespace ChmBrowser.Common
             _isSaving = false;
         }
 
-        public bool SetNext()
+        public async Task<bool> SetNext()
         {
-            if (HasOutline)
+            if (HasOutline && Current + 1< Chm.Contents.Count)
             {
-                var next = Current.Next;
-                while (next != null && next.Parent != null && next.Url == Current.Url)
+                int i = 1;
+                while (Current + i < Chm.Contents.Count)
                 {
-                    next = next.Next;
-                }
-                if (next != null && next.Parent != null)
-                {
-                    SetCurrent(next);
-                    return true;
+                    if (await SetCurrent(Current + i))
+                    {
+                        return true;
+                    }
+                    i++;
                 }
             }
             return false;
         }
 
-        public bool SetPrevious()
+        public async Task<bool> SetPrevious()
         {
-            if (HasOutline)
+            if (HasOutline && Current > 0)
             {
-                var prev = Current.Prev;
-                while (prev != null && prev.Parent != null && prev.Url == Current.Url)
+                int i = 1;
+                while (Current - i >= 0)
                 {
-                    prev = prev.Prev;
-                }
-                if (prev != null && prev.Parent != null)
-                {
-                    SetCurrent(prev);
-                    return true;
+                    if (await SetCurrent(Current - i))
+                    {
+                        return true;
+                    }
+                    i++;
                 }
             }
             return false;
         }
 
-        public void SetCurrent(ChmOutline outline)
-        {
-            Current = outline;
-            CurrentPath = outline.Url;
-            ChmMeta.SetLast(outline.Url);
+        public async Task<bool> SetCurrent(int index)
+        { 
+            if (index >= Chm.Contents.Count || index < 0
+                || string.IsNullOrWhiteSpace(Chm.Contents[index].Url)) 
+            { 
+                return false; 
+            }
+            string url = Chm.Contents[index].Url;
+            if (!await HasData(url))
+            {
+                return false;
+            }
+
+            Current = index;
+            CurrentPath = url;
+            ChmMeta.SetLast(CurrentPath);
+            return true;
         }
 
         public async Task<bool> SetCurrent(string url)
@@ -331,24 +337,16 @@ namespace ChmBrowser.Common
                 ChmMeta.SetLast(CurrentPath);
                 return false;
             }
-            if (Current != null && string.Compare(url, Current.Url, StringComparison.OrdinalIgnoreCase) == 0)
+            if (Current >= 0 && Current < Chm.Contents.Count 
+                && string.Compare(url, Chm.Contents[Current].Url, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 return true;
             }
-            return SetCurrent(Chm.Outline, url);
-        }
-
-        private bool SetCurrent(ChmOutline node, string url)
-        {
-            if (string.Compare(url, node.Url, StringComparison.OrdinalIgnoreCase) == 0)
+            for (int i = 0; i < Chm.Contents.Count; ++i)
             {
-                SetCurrent(node);
-                return true;
-            }
-            for (int i = 0; i < node.SubSections.Count; ++i)
-            {
-                if (SetCurrent(node.SubSections[i], url))
+                if (string.Compare(url, Chm.Contents[i].Url, StringComparison.OrdinalIgnoreCase) == 0)
                 {
+                    await SetCurrent(i);
                     return true;
                 }
             }

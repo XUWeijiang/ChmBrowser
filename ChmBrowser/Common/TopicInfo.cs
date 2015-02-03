@@ -16,9 +16,9 @@ namespace ChmBrowser.Common
     {
         private bool _isSelected = false;
 
-        public string Topic { get; set; }
-        public int Level { get; set; }
-        public string Url { get; set; }
+        public string Topic { get { return ChmFile.CurrentFile.Chm.Contents[TopicId].Name; } }
+        public int Level { get { return ChmFile.CurrentFile.Chm.Contents[TopicId].Level; } }
+        public string Url { get { return ChmFile.CurrentFile.Chm.Contents[TopicId].Url; } }
         public bool IsSelected 
         {
             get { return _isSelected; }
@@ -32,12 +32,12 @@ namespace ChmBrowser.Common
             }
         }
 
-        public ChmCore.ChmOutline Outline { get; private set; }
+        public int TopicId { get; private set; }
 
         public Thickness Margin {
             get
             {
-                return new Thickness(Level * 30, 6, 0, 0);
+                return new Thickness((Level - 1) * 30, 6, 0, 0);
             }
         }
 
@@ -56,13 +56,10 @@ namespace ChmBrowser.Common
             }
         }
 
-        public TopicInfo(ChmCore.ChmOutline outline, int level)
+        public TopicInfo(int topicId)
         {
             IsSelected = false;
-            Outline = outline;
-            Topic = outline.Name;
-            Url = outline.Url;
-            Level = level;
+            TopicId = topicId;
         }
     }
 
@@ -139,24 +136,14 @@ namespace ChmBrowser.Common
             }
         }
 
-        public static IList<TopicInfo> LoadTopcisInfo(ChmCore.ChmOutline outline)
+        public void RefreshTopcisInfo()
         {
             IList<TopicInfo> entries = new List<TopicInfo>();
-            AddTopics(entries, outline, 0);
-            return entries;
-        }
-
-        private static void AddTopics(IList<TopicInfo> entries, ChmCore.ChmOutline outline, int level)
-        {
-            if (outline != null && outline.SubSections != null)
+            for(int i = 0; i < ChmFile.CurrentFile.Chm.Contents.Count; ++i)
             {
-                foreach (var x in outline.SubSections)
-                {
-                    entries.Add(new TopicInfo(x, level));
-                    AddTopics(entries, x, level + 1);
-                }
+                entries.Add(new TopicInfo(i));
             }
+            Topics = entries;
         }
-        
     }
 }
