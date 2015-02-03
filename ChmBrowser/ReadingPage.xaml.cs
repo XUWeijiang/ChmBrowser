@@ -62,37 +62,33 @@ namespace ChmBrowser
                 args.Cancel = true;
                 await Windows.System.Launcher.LaunchUriAsync(args.Uri);
             }
-            else if (!args.Uri.AbsolutePath.StartsWith("/" + ChmFile.CurrentFile.Key))
-            {
-                args.Cancel = true;
-            }
             else
             {
                 progressBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
             }
         }
-        void webView_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
+        async void webView_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
         {
             progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             _lastWebViewUrl = args.Uri;
             if (args.Uri.Scheme == "ms-local-stream")
             {
-                string path = args.Uri.AbsolutePath.Substring(ChmFile.CurrentFile.Key.Length + 1);
-                ChmFile.CurrentFile.SetCurrent(path);
-                
-                if (!ChmFile.CurrentFile.HasThumbnail)
-                {
-                    _mutex.WaitOne();
-                    try
-                    {
-                        // Uncomment to capture thumbnail.
-                        // await ChmFile.CurrentFile.CreateThumbnailFile(async (s) => await webView.CapturePreviewToStreamAsync(s));
-                    }
-                    finally
-                    {
-                        _mutex.ReleaseMutex();
-                    }
-                }
+                string path = args.Uri.AbsolutePath + args.Uri.Fragment;
+                await ChmFile.CurrentFile.SetCurrent(path);
+
+                // Uncomment to capture thumbnail.
+                //if (!ChmFile.CurrentFile.HasThumbnail)
+                //{
+                //    _mutex.WaitOne();
+                //    try
+                //    {
+                //        await ChmFile.CurrentFile.CreateThumbnailFile(async (s) => await webView.CapturePreviewToStreamAsync(s));
+                //    }
+                //    finally
+                //    {
+                //        _mutex.ReleaseMutex();
+                //    }
+                //}
             }
         }
 
@@ -126,7 +122,12 @@ namespace ChmBrowser
         /// This parameter is typically used to configure the page.</param>
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
+            scaleSlider.ValueChanged -= scaleSlider_ValueChanged;
+            isAutoZoom.Toggled -= isAutoZoom_Toggled;
             ResetSetting();
+            scaleSlider.ValueChanged += scaleSlider_ValueChanged;
+            isAutoZoom.Toggled += isAutoZoom_Toggled;
+
             await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().HideAsync();
             HardwareButtons.BackPressed += HardwareButtons_BackPressed;
             commandBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
@@ -154,6 +155,14 @@ namespace ChmBrowser
 
         protected async override void OnNavigatedFrom(NavigationEventArgs e)
         {
+            if (e.SourcePageType == typeof(ContentPage))
+            {
+                NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Required;
+            }
+            else
+            {
+                NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Disabled;
+            }
             HardwareButtons.BackPressed -= HardwareButtons_BackPressed;
             await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().ShowAsync();
             base.OnNavigatedFrom(e);
@@ -182,20 +191,12 @@ namespace ChmBrowser
         {
             if (!string.IsNullOrEmpty(ChmFile.CurrentFile.CurrentPath))
             {
-                try
+                Uri url = webView.BuildLocalStreamUri("MyTag", ChmFile.CurrentFile.CurrentPath);
+                if (_lastWebViewUrl != url || _lastWebViewUrl.Fragment != url.Fragment)
                 {
-                    _mutex.WaitOne();
-                    Uri url = webView.BuildLocalStreamUri("MyTag", ChmFile.CurrentFile.Key + "/" +  ChmFile.CurrentFile.CurrentPath);
-                    if (_lastWebViewUrl != url)
-                    {
-                        webView.Stop();
-                        webView.NavigateToLocalStreamUri(url, new ChmStreamUriTResolver(zoomIndicator.Text));
-                        await ChmFile.CurrentFile.Save();
-                    }
-                }
-                finally
-                {
-                    _mutex.ReleaseMutex();
+                    webView.Stop();
+                    webView.NavigateToLocalStreamUri(url, new ChmStreamUriTResolver(zoomIndicator.Text));
+                    await ChmFile.CurrentFile.Save();
                 }
             }
         }
@@ -327,7 +328,7 @@ namespace ChmBrowser
             );
 
         private string _scale;
-
+        
         public ChmStreamUriTResolver(string scale = "auto")
         {
             _scale = scale;
@@ -354,7 +355,7 @@ namespace ChmBrowser
             {
                 throw new Exception();
             }
-            string path = uri.AbsolutePath.Substring(ChmFile.CurrentFile.Key.Length + 1); 
+            string path = uri.AbsolutePath; 
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 System.Diagnostics.Debug.WriteLine(string.Format("Stream Requested: {0}", uri.ToString()));
@@ -363,7 +364,6 @@ namespace ChmBrowser
             // call into a seperate helper method that can use the C# await pattern.
             return getContent(path).AsAsyncOperation();
         }
-
         /// <summary>
         /// Helper that cracks the path and resolves the Uri
         /// Uses the C# await pattern to coordinate async operations
@@ -372,27 +372,28 @@ namespace ChmBrowser
         /// <returns></returns>
         private async Task<IInputStream> getContent(string path)
         {
-            return await Task.Run(async () =>
+            byte[] data = await ChmFile.CurrentFile.GetData(path);
+            if (data == null || data.Length == 0)
+            {
+                throw new Exception();
+            }
+            using (var memoryStream = new InMemoryRandomAccessStream())
+            {
+                using (var dataWriter = new DataWriter(memoryStream))
                 {
-                    byte[] data = ChmFile.CurrentFile.Chm.GetData(path);
-                    using (var memoryStream = new InMemoryRandomAccessStream())
+                    dataWriter.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
+                    dataWriter.ByteOrder = ByteOrder.LittleEndian;
+                    dataWriter.WriteBytes(data);
+                    if (IsHtml(path))
                     {
-                        using (var dataWriter = new DataWriter(memoryStream))
-                        {
-                            dataWriter.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
-                            dataWriter.ByteOrder = ByteOrder.LittleEndian;
-                            dataWriter.WriteBytes(data);
-                            if (IsHtml(path))
-                            {
-                                dataWriter.WriteBytes(GetInjectedContent());
-                            }
-                            await dataWriter.StoreAsync();
-                            await dataWriter.FlushAsync();
-                            dataWriter.DetachStream();
-                        }
-                        return memoryStream.GetInputStreamAt(0);
+                        dataWriter.WriteBytes(GetInjectedContent());
                     }
-                });
+                    await dataWriter.StoreAsync();
+                    await dataWriter.FlushAsync();
+                    dataWriter.DetachStream();
+                }
+                return memoryStream.GetInputStreamAt(0);
+            }
         }
         private static bool IsHtml(string path)
         {

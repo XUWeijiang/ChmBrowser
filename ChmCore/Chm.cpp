@@ -7,15 +7,53 @@
 using namespace ChmCore;
 using namespace Platform;
 
-ChmOutline^ CreateOutlineFromTopic(const Topic& t, ChmOutline^ parent)
-{
-    ChmOutline^ outline = ref new ChmOutline(ref new Platform::String(t.Name.c_str()), ref new Platform::String(t.Url.c_str()), parent);
-    for (size_t i = 0; i < t.SubTopics.size(); ++i)
+class EbookTocExtractor : public EbookTocVisitor{
+private:
+    std::stack<ChmOutline^> topics_stack_;
+    std::stack<int> topics_level_stack_;
+    ChmOutline^ root_;
+public:
+    EbookTocExtractor()
     {
-        outline->SubSections->Append(CreateOutlineFromTopic(t.SubTopics[i], outline));
+        root_ = ref new ChmOutline("", "", nullptr);
+        topics_stack_.push(root_);
+        topics_level_stack_.push(0);
     }
-    return outline;
-}
+    ChmOutline^ GetOutline()
+    {
+        return root_;
+    }
+public:
+    virtual void Visit(const WCHAR *name, const WCHAR *url, int level) override
+    {
+        if (url == nullptr)
+        {
+            return;
+        }
+        while (!topics_stack_.empty() && topics_level_stack_.top() >= level)
+        {
+            topics_stack_.pop();
+            topics_level_stack_.pop();
+        }
+        if (topics_stack_.empty())
+        {
+            topics_stack_.push(root_);
+            topics_level_stack_.push(0);
+        }
+        while (*url == '/') // trim backslash.
+        {
+            url++;
+        }
+        auto x = topics_stack_.top();
+        ChmOutline^ newOutline = ref new ChmOutline(
+            ref new Platform::String(name), 
+            ref new Platform::String(url), 
+            x);
+        x->SubSections->Append(newOutline);
+        topics_stack_.push(newOutline);
+        topics_level_stack_.push(level);
+    }
+};
 
 Chm::Chm(Platform::String^ file)
 {
@@ -25,8 +63,16 @@ Chm::Chm(Platform::String^ file)
     {
         throw ref new Platform::FailureException();
     }
-    auto t = doc_->GetTopics();
-    Outline = CreateOutlineFromTopic(t, nullptr);
+    try
+    {
+        EbookTocExtractor holder;
+        doc_->ParseToc(&holder);
+        Outline = holder.GetOutline();
+    }
+    catch (...)
+    {
+        Outline = nullptr;
+    }
     WCHAR* title = doc_->GetProperty(DocumentProperty::Prop_Title);
     if (title != nullptr)
     {
@@ -45,11 +91,10 @@ Chm::Chm(Platform::String^ file)
     }
     home_ = ref new Platform::String(url);
     free(home);
-    InitializeCriticalSectionEx(&docAccess_, 0, 0);
 }
+
 Platform::Array<byte>^ Chm::GetData(Platform::String^ path)
 {
-    ScopedCritSec scope(&docAccess_);
     ScopedMem<WCHAR> plainUrl(url::GetFullPath(path->Data()));
     size_t length;
     ScopedMem<char> urlUtf8(str::conv::ToUtf8(plainUrl));
@@ -65,7 +110,6 @@ Platform::Array<byte>^ Chm::GetData(Platform::String^ path)
 }
 bool Chm::HasData(Platform::String^ path)
 {
-    ScopedCritSec scope(&docAccess_);
     ScopedMem<WCHAR> plainUrl(url::GetFullPath(path->Data()));
     ScopedMem<char> urlUtf8(str::conv::ToUtf8(plainUrl));
     return doc_->HasData(urlUtf8);

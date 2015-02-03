@@ -103,7 +103,9 @@ namespace ChmBrowser
 
         private async Task OpenLocalChmFile(string key)
         {
+            progressBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
             bool success = await ChmFile.OpenLocalChmFile(key);
+            progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
 
             if (!success) // failed
             {

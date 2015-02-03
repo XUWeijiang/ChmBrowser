@@ -34,10 +34,18 @@ namespace ChmBrowser.Common
                 if (value != null)
                 {
                     FileHistory.UpdateHistoryWhenOpenFile(value.Key);
-                    if (_currentFile != null && _currentFile.Chm != null)
+                    if (_currentFile != null)
                     {
-                        _currentFile.Chm.Dispose();
-                        _currentFile.Chm = null;
+                        if (_currentFile.Current != null)
+                        {
+                            _currentFile.Current = null;
+                        }
+
+                        if (_currentFile.Chm != null)
+                        {
+                            _currentFile.Chm.Dispose();
+                            _currentFile.Chm = null;
+                        }
                     }
                 }
                 _currentFile = value;
@@ -54,8 +62,7 @@ namespace ChmBrowser.Common
             catch
             {
                 return false;
-            }
-              
+            } 
         }
         public static async Task<bool> DeleteFile(string key)
         {
@@ -87,7 +94,7 @@ namespace ChmBrowser.Common
             
             try
             {
-                ret.Chm = new ChmCore.Chm(file.Path);
+                ret.Chm = await LoadChm(file.Path);
                 MetaInfo meta = new MetaInfo();
                 meta.SetOriginalPath(path);
                 if (ret.Chm.Title != null)
@@ -99,8 +106,8 @@ namespace ChmBrowser.Common
                     meta.SetDisplayName(System.IO.Path.GetFileNameWithoutExtension(name));
                 }
                 ret.ChmMeta = meta;
-                ret.SetCurrent(ret.Chm.Home);
-                await meta.SaveMetaInfo(ret.Key);
+                await ret.SetCurrent(ret.Chm.Home);
+                await ret.Save();
             }
             catch
             {
@@ -129,7 +136,7 @@ namespace ChmBrowser.Common
             var file = await storageFile.CopyAsync(localFolder, ret.Key + ChmFileExtension);
             try
             {
-                ret.Chm = new ChmCore.Chm(file.Path);
+                ret.Chm = await LoadChm(file.Path);
                 MetaInfo meta = new MetaInfo();
                 meta.SetOriginalPath(storageFile.Path);
                 if (ret.Chm.Title != null)
@@ -141,8 +148,8 @@ namespace ChmBrowser.Common
                     meta.SetDisplayName(System.IO.Path.GetFileNameWithoutExtension(storageFile.Name));
                 }
                 ret.ChmMeta = meta;
-                ret.SetCurrent(ret.Chm.Home);
-                await meta.SaveMetaInfo(ret.Key);
+                await ret.SetCurrent(ret.Chm.Home);
+                await ret.Save();
             }
             catch
             {
@@ -174,7 +181,7 @@ namespace ChmBrowser.Common
                 ChmFile ret = new ChmFile();
                 ret.Key = key;
                 var file = await localFolder.GetFileAsync(key + ChmFileExtension);
-                ret.Chm = new ChmCore.Chm(file.Path);
+                ret.Chm = await LoadChm(file.Path);
                 ret.ChmMeta = await MetaInfo.ReadMetaInfo(key);
                 ret.HasThumbnail = await Snapshot.HasSnapshot(key);
                 if (ret.Chm.Title != null)
@@ -195,12 +202,12 @@ namespace ChmBrowser.Common
                 //}
                 if (!ret.ChmMeta.ContainsLast())
                 {
-                    ret.SetCurrent(ret.Chm.Home);
+                    await ret.SetCurrent(ret.Chm.Home);
                     //await ret.ChmMeta.SaveMetaInfo(key);
                 }
                 else
                 {
-                    ret.SetCurrent(ret.ChmMeta.GetLast());
+                    await ret.SetCurrent(ret.ChmMeta.GetLast());
                 }
                 CurrentFile = ret;
                 return true;
@@ -218,13 +225,38 @@ namespace ChmBrowser.Common
 
         public Chm Chm { get; private set; }
         private ChmOutline Current { get; set; }
-        public bool HasOutline { get { return Chm.Outline.SubSections != null && Chm.Outline.SubSections.Count > 0; } }
+        public bool HasOutline { get { return Chm.Outline != null && Chm.Outline.SubSections != null && Chm.Outline.SubSections.Count > 0; } }
         public string CurrentPath { get; private set; }
         public MetaInfo ChmMeta { get; private set; }
         public string Key { get; private set; }
         public bool HasThumbnail { get; private set; }
 
         private bool _isSaving = false;
+
+        public static async Task<Chm> LoadChm(string path)
+        {
+            return await Task.Run(() =>
+                {
+                    Chm chm = new Chm(path); 
+                    return chm;
+                });
+        }
+
+        public async Task<byte[]> GetData(string path)
+        {
+            return await Task.Run(() =>
+            {
+                return Chm.GetData(path);
+            });
+        }
+
+        public async Task<bool> HasData(string path)
+        {
+            return await Task.Run(() =>
+            {
+                return Chm.HasData(path);
+            });
+        }
 
         public async Task CreateThumbnailFile(Func<IRandomAccessStream, Task> create)
         {
@@ -286,9 +318,9 @@ namespace ChmBrowser.Common
             ChmMeta.SetLast(outline.Url);
         }
 
-        public bool SetCurrent(string url)
+        public async Task<bool> SetCurrent(string url)
         {
-            if (!Chm.HasData(url))
+            if (!await HasData(url))
             {
                 return false;
             }

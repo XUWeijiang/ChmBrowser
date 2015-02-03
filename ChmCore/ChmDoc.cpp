@@ -454,7 +454,7 @@ bool ChmDoc::ParseTocOrIndex(EbookTocVisitor *visitor, const char *path, bool is
     if (!path)
         return false;
     // TODO: is path already UTF-8 encoded - or do we need str::conv::ToUtf8(ToStr(path)) ?
-    ScopedMem<unsigned char> htmlData(GetData(path, nullptr));
+    ScopedMem<unsigned char> htmlData(GetData(str::conv::ToUtf8(ToStr(path)), nullptr));
     const char *html = (char *)htmlData.Get();
     if (!html)
         return false;

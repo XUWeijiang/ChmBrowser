@@ -112,6 +112,5 @@ namespace ChmCore
         bool HasData(Platform::String^ path);
     private:
         std::unique_ptr<ChmDoc> doc_;
-        CRITICAL_SECTION docAccess_;
     };
 }

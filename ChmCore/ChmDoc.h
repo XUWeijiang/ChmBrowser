@@ -40,12 +40,6 @@ public:
     bool HasIndex() const;
     bool ParseIndex(EbookTocVisitor *visitor);
 
-    Topic GetTopics()
-    {
-        EbookTocHolder holder;
-        ParseToc(&holder);
-        return holder.GetTopic();
-    }
     static bool IsSupportedFile(const WCHAR *fileName, bool sniff=false);
     static ChmDoc *CreateFromFile(const WCHAR *fileName);
 };
