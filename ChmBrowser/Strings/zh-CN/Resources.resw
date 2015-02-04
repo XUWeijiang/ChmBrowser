@@ -165,8 +165,14 @@
   <data name="IconStatement.Text" xml:space="preserve">
     <value>本软件所有图标均来自网络，如果有任何版权问题，请联系我。</value>
   </data>
+  <data name="IconView.Label" xml:space="preserve">
+    <value>图标视图</value>
+  </data>
   <data name="InvalidFile" xml:space="preserve">
     <value>{0}: 无效文件</value>
+  </data>
+  <data name="ListView.Label" xml:space="preserve">
+    <value>列表视图</value>
   </data>
   <data name="MailSubject" xml:space="preserve">
     <value>CHM阅读器反馈</value>

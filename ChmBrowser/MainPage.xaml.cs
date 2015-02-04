@@ -48,6 +48,7 @@ namespace ChmBrowser
         /// This parameter is typically used to configure the page.</param>
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
+            LoadIconListView();
             progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             Frame.BackStack.Clear(); // a new start...
             if (e.NavigationMode == NavigationMode.New && e.Parameter != null && !string.IsNullOrEmpty(e.Parameter.ToString()))
@@ -208,6 +209,39 @@ namespace ChmBrowser
         private void GoAbout_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(AboutPage));
+        }
+
+        private void IconListSwitch_Click(object sender, RoutedEventArgs e)
+        {
+            SetIconListView(sender == listButton);
+            SaveIconListView();
+        }
+        private void SaveIconListView()
+        {
+            var setting = Windows.Storage.ApplicationData.Current.LocalSettings;
+            setting.Values["item_view"] = listButton.Visibility == Windows.UI.Xaml.Visibility.Collapsed?"list":"icon";
+        }
+        private void LoadIconListView()
+        {
+            var setting = Windows.Storage.ApplicationData.Current.LocalSettings;
+            object value;
+            bool isIcon = !setting.Values.TryGetValue("item_view", out value) || value.ToString() == "icon";
+            SetIconListView(!isIcon);
+        }
+        private void SetIconListView(bool isList)
+        {
+            if (isList)
+            {
+                listButton.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                iconButton.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                ItemGridView.ItemTemplate = (DataTemplate)this.Resources["GridViewListItemTemplate"];
+            }
+            else
+            {
+                listButton.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                iconButton.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                ItemGridView.ItemTemplate = (DataTemplate)this.Resources["GridViewItemTemplate"];
+            }
         }
     }
 }

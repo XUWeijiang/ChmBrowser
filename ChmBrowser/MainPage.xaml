@@ -25,6 +25,18 @@
                 </Grid>
             </Grid>
         </DataTemplate>
+        <DataTemplate x:Key="GridViewListItemTemplate">
+            <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+                <Grid Margin="25,10,25,0" FlyoutBase.AttachedFlyout="{StaticResource itemMenuFlyout}" Holding="ItemGridView_Holding">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="64"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0" x:Name="image" Height="64" Width="64" VerticalAlignment="Center" Margin="0,0,10,0" Source="{Binding Image}"/>
+                    <TextBlock Margin="10, 0, 0, 0" TextAlignment="Left" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Grid.Column="1" x:Name="titleTextBlock" TextWrapping="Wrap" MaxLines="2" Text="{Binding Name}" HorizontalAlignment="Center" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="15" FontWeight="Light" FontFamily="Segoe UI"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
     </Page.Resources>
     <Grid x:Name="LayoutRoot">
 
@@ -54,7 +66,7 @@
                 </Grid.RowDefinitions>
                 <GridView Grid.Row="0" x:Name="ItemGridView"
                         Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" 
-                        ItemTemplate="{StaticResource GridViewItemTemplate}" 
+                        ItemTemplate="{StaticResource GridViewListItemTemplate}" 
                         ItemsSource="{Binding Entries}"
                         ShowsScrollingPlaceholders="False" 
                         VerticalAlignment="Stretch"
@@ -96,6 +108,8 @@
     <Page.BottomAppBar>
         <CommandBar ClosedDisplayMode="Minimal">
             <CommandBar.PrimaryCommands>
+                <AppBarButton x:Uid="ListView" x:Name="listButton" Label="列表视图" Icon="AllApps" Click="IconListSwitch_Click" Visibility="Collapsed"/>
+                <AppBarButton x:Uid="IconView" x:Name="iconButton" Label="图标视图" Icon="ViewAll" Click="IconListSwitch_Click"/>
                 <AppBarButton x:Uid="AboutButton" Label="关于" Click="GoAbout_Click"  Icon="Link">
                 </AppBarButton>
             </CommandBar.PrimaryCommands>

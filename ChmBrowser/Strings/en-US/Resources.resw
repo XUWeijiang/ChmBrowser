@@ -165,8 +165,14 @@
   <data name="IconStatement.Text" xml:space="preserve">
     <value>All icons in this app are from internet. Please contact me if any of them violates copyright restrictions.</value>
   </data>
+  <data name="IconView.Label" xml:space="preserve">
+    <value>icon view</value>
+  </data>
   <data name="InvalidFile" xml:space="preserve">
     <value>{0}: invalid file</value>
+  </data>
+  <data name="ListView.Label" xml:space="preserve">
+    <value>list view</value>
   </data>
   <data name="MailSubject" xml:space="preserve">
     <value>Feedback for CHM Reader</value>
