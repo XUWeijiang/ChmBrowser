@@ -156,6 +156,9 @@
   <data name="ContentsButton.Label" xml:space="preserve">
     <value>目录</value>
   </data>
+  <data name="Copying" xml:space="preserve">
+    <value>正在复制文件...</value>
+  </data>
   <data name="GoBack.Label" xml:space="preserve">
     <value>后退</value>
   </data>
@@ -182,6 +185,9 @@
   </data>
   <data name="Next.Label" xml:space="preserve">
     <value>下一章</value>
+  </data>
+  <data name="Opening" xml:space="preserve">
+    <value>正在打开文件...</value>
   </data>
   <data name="OpenSource.Text" xml:space="preserve">
     <value>基于开源规则，我也正在整理代码。整理完成后会放到Github上去。</value>

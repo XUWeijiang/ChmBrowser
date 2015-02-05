@@ -17,7 +17,7 @@
         </Grid.RowDefinitions>
         <ProgressBar x:Name="progressBar" Grid.Row="0" IsIndeterminate="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed"/>
         <WebView Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="webView"/>
-        <Grid x:Name="settingRoot" Grid.Row="2" Margin="19,10,0,0" Visibility="Collapsed">
+        <Grid x:Name="settingRoot" Grid.Row="2" Margin="19,10,0,0">
             <Grid.ChildrenTransitions>
                 <TransitionCollection>
                     <EntranceThemeTransition/>

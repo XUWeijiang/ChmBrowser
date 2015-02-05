@@ -38,6 +38,7 @@ namespace ChmBrowser
         public ReadingPage()
         {
             this.InitializeComponent();
+            root.Children.Remove(settingRoot);
             this.NavigationCacheMode = NavigationCacheMode.Required;
             _lastWebViewUrl = null;
             webView.NavigationCompleted += webView_NavigationCompleted;

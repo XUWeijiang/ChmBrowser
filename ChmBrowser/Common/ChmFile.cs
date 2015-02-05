@@ -74,6 +74,11 @@ namespace ChmBrowser.Common
             }
         }
 
+        public static void CloseChmFile()
+        {
+            CurrentFile = null;
+        }
+
         public static async Task<bool> OpenChmFileFromOneDrive(LiveConnectClient client, 
             IProgress<LiveOperationProgress> progressHandler,
             System.Threading.CancellationToken ctoken,

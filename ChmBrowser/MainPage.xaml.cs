@@ -23,6 +23,7 @@ using ChmBrowser.Common;
 using Microsoft.Live;
 using Windows.UI.StartScreen;
 using System.Threading.Tasks;
+using Windows.UI;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
 
@@ -48,6 +49,9 @@ namespace ChmBrowser
         /// This parameter is typically used to configure the page.</param>
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
+            Color defaultBackground = (Color)App.Current.Resources["PhoneBackgroundColor"];
+            progressBarGrid.Background = new SolidColorBrush(Color.FromArgb(0x30, defaultBackground.R, defaultBackground.G, defaultBackground.B));
+            ChmFile.CloseChmFile();
             LoadIconListView();
             Frame.BackStack.Clear(); // a new start...
             if (e.NavigationMode == NavigationMode.New && e.Parameter != null && !string.IsNullOrEmpty(e.Parameter.ToString()))
@@ -83,6 +87,7 @@ namespace ChmBrowser
                 StartProcessing();
                 try
                 {
+                    SetProgressString(App.Localizer.GetString("Copying"));
                     bool success = await ChmFile.OpenChmFileFromPhone(args.Files[0]);
                     if (!success) // failed
                     {
@@ -112,6 +117,7 @@ namespace ChmBrowser
             StartProcessing();
             try
             {
+                SetProgressString(App.Localizer.GetString("Opening"));
                 bool success = await ChmFile.OpenLocalChmFile(key);
                 if (!success) // failed
                 {
@@ -240,13 +246,18 @@ namespace ChmBrowser
         }
         private void StartProcessing()
         {
-            progressBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            LayoutRoot.IsHitTestVisible = false;
+            SetProgressString("");
+            progressBarGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            //LayoutRoot.IsHitTestVisible = false;
         }
         private void StopProcessing()
         {
-            progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            LayoutRoot.IsHitTestVisible = true;
+            progressBarGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            //LayoutRoot.IsHitTestVisible = true;
+        }
+        private void SetProgressString(string value)
+        {
+            progressMessage.Text = value;
         }
         private void SetIconListView(bool isList)
         {

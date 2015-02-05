@@ -156,6 +156,9 @@
   <data name="ContentsButton.Label" xml:space="preserve">
     <value>contents</value>
   </data>
+  <data name="Copying" xml:space="preserve">
+    <value>copying file...</value>
+  </data>
   <data name="GoBack.Label" xml:space="preserve">
     <value>go back</value>
   </data>
@@ -182,6 +185,9 @@
   </data>
   <data name="Next.Label" xml:space="preserve">
     <value>next</value>
+  </data>
+  <data name="Opening" xml:space="preserve">
+    <value>opening file...</value>
   </data>
   <data name="OpenSource.Text" xml:space="preserve">
     <value>Based on the rule of open source, I will share my source code on Github when ready.</value>
