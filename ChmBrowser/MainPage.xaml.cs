@@ -49,7 +49,6 @@ namespace ChmBrowser
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             LoadIconListView();
-            progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             Frame.BackStack.Clear(); // a new start...
             if (e.NavigationMode == NavigationMode.New && e.Parameter != null && !string.IsNullOrEmpty(e.Parameter.ToString()))
             {
@@ -81,17 +80,23 @@ namespace ChmBrowser
         {
             if (args.Files.Count > 0)
             {
-                progressBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                bool success = await ChmFile.OpenChmFileFromPhone(args.Files[0]);
-                progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                if (!success) // failed
+                StartProcessing();
+                try
                 {
-                    MessageDialog msg = new MessageDialog(string.Format(App.Localizer.GetString("InvalidFile"), args.Files[0].Path));
-                    await msg.ShowAsync();
+                    bool success = await ChmFile.OpenChmFileFromPhone(args.Files[0]);
+                    if (!success) // failed
+                    {
+                        MessageDialog msg = new MessageDialog(string.Format(App.Localizer.GetString("InvalidFile"), args.Files[0].Path));
+                        await msg.ShowAsync();
+                    }
+                    else
+                    {
+                        Frame.Navigate(typeof(ReadingPage));
+                    }
                 }
-                else
+                finally
                 {
-                    Frame.Navigate(typeof(ReadingPage));
+                    StopProcessing();
                 }
             }
         }
@@ -104,26 +109,31 @@ namespace ChmBrowser
 
         private async Task OpenLocalChmFile(string key)
         {
-            progressBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
-            bool success = await ChmFile.OpenLocalChmFile(key);
-            progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-
-            if (!success) // failed
+            StartProcessing();
+            try
             {
-                MessageDialog msg = new MessageDialog(string.Format(App.Localizer.GetString("InvalidFile"), key));
-                await msg.ShowAsync();
-            }
-            else
-            {
-                // update old name (created by older version) when open file.
-                foreach(var entry in _history.Entries)
+                bool success = await ChmFile.OpenLocalChmFile(key);
+                if (!success) // failed
                 {
-                    if (entry.Key == key)
-                    {
-                        entry.Name = ChmFile.CurrentFile.ChmMeta.GetDisplayName(); 
-                    }
+                    MessageDialog msg = new MessageDialog(string.Format(App.Localizer.GetString("InvalidFile"), key));
+                    await msg.ShowAsync();
                 }
-                Frame.Navigate(typeof(ReadingPage));
+                else
+                {
+                    // update old name (created by older version) when open file.
+                    foreach (var entry in _history.Entries)
+                    {
+                        if (entry.Key == key)
+                        {
+                            entry.Name = ChmFile.CurrentFile.ChmMeta.GetDisplayName();
+                        }
+                    }
+                    Frame.Navigate(typeof(ReadingPage));
+                }
+            }
+            finally
+            {
+                StopProcessing();
             }
         }
 
@@ -228,19 +238,31 @@ namespace ChmBrowser
             bool isIcon = !setting.Values.TryGetValue("item_view", out value) || value.ToString() == "icon";
             SetIconListView(!isIcon);
         }
+        private void StartProcessing()
+        {
+            progressBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            LayoutRoot.IsHitTestVisible = false;
+        }
+        private void StopProcessing()
+        {
+            progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            LayoutRoot.IsHitTestVisible = true;
+        }
         private void SetIconListView(bool isList)
         {
             if (isList)
             {
                 listButton.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 iconButton.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                ItemGridView.ItemTemplate = (DataTemplate)this.Resources["GridViewListItemTemplate"];
+                ItemGridView.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                ItemListView.Visibility = Windows.UI.Xaml.Visibility.Visible;
             }
             else
             {
                 listButton.Visibility = Windows.UI.Xaml.Visibility.Visible;
                 iconButton.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                ItemGridView.ItemTemplate = (DataTemplate)this.Resources["GridViewItemTemplate"];
+                ItemGridView.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                ItemListView.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             }
         }
     }

@@ -20,20 +20,23 @@
                         <RowDefinition Height="96"/>
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <Image Grid.Row="0" x:Name="image" Height="96" Width="96" VerticalAlignment="Center" Margin="0,0,10,0" Source="{Binding Image}"/>
-                    <TextBlock TextAlignment="Center" TextTrimming="CharacterEllipsis" Grid.Row="1" x:Name="titleTextBlock" Width="96" TextWrapping="Wrap" MaxLines="2" Text="{Binding Name}" HorizontalAlignment="Center" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="15" FontWeight="Light" FontFamily="Segoe UI"/>
+                    <Image Grid.Row="0" Height="96" Width="96" VerticalAlignment="Center" Margin="0,0,10,0" Source="{Binding Image}"/>
+                    <TextBlock TextAlignment="Center" TextTrimming="CharacterEllipsis" Grid.Row="1" Width="96" TextWrapping="Wrap" MaxLines="2" Text="{Binding Name}" HorizontalAlignment="Center" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="15" FontWeight="Light" FontFamily="Segoe UI"/>
                 </Grid>
             </Grid>
         </DataTemplate>
-        <DataTemplate x:Key="GridViewListItemTemplate">
+        <DataTemplate x:Key="ListViewItemTemplate">
             <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-                <Grid Margin="25,10,25,0" FlyoutBase.AttachedFlyout="{StaticResource itemMenuFlyout}" Holding="ItemGridView_Holding">
+                <Grid Margin="20,10,25,0" FlyoutBase.AttachedFlyout="{StaticResource itemMenuFlyout}" Holding="ItemGridView_Holding">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="64"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Image Grid.Column="0" x:Name="image" Height="64" Width="64" VerticalAlignment="Center" Margin="0,0,10,0" Source="{Binding Image}"/>
-                    <TextBlock Margin="10, 0, 0, 0" TextAlignment="Left" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Grid.Column="1" x:Name="titleTextBlock" TextWrapping="Wrap" MaxLines="2" Text="{Binding Name}" HorizontalAlignment="Center" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="15" FontWeight="Light" FontFamily="Segoe UI"/>
+                    <Image Grid.Column="0" Height="80" Width="80" VerticalAlignment="Center" Margin="0,0,10,0" Source="{Binding Image}"/>
+                    <TextBlock Grid.Column="1"  Margin="5, 0, 0, 0" TextAlignment="Left" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" 
+                               TextWrapping="Wrap" MaxLines="2" Text="{Binding Name}" 
+                               HorizontalAlignment="Stretch" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" 
+                               FontSize="15" FontWeight="Light" FontFamily="Segoe UI"/>
                 </Grid>
             </Grid>
         </DataTemplate>
@@ -66,7 +69,7 @@
                 </Grid.RowDefinitions>
                 <GridView Grid.Row="0" x:Name="ItemGridView"
                         Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" 
-                        ItemTemplate="{StaticResource GridViewListItemTemplate}" 
+                        ItemTemplate="{StaticResource GridViewItemTemplate}" 
                         ItemsSource="{Binding Entries}"
                         ShowsScrollingPlaceholders="False" 
                         VerticalAlignment="Stretch"
@@ -83,6 +86,18 @@
                         </Style>
                     </GridView.ItemContainerStyle>
                 </GridView>
+                <ListView Grid.Row="0" x:Name="ItemListView" 
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" 
+                    ItemTemplate="{StaticResource ListViewItemTemplate}" 
+                    ItemsSource="{Binding Entries}"
+                    ShowsScrollingPlaceholders="False" 
+                    SelectionMode="Single"
+                    IsItemClickEnabled="true"
+                    IsHoldingEnabled="True"
+                    ItemClick="ItemGridView_ItemClick"
+                />
                 <TextBlock x:Uid="Browse" Grid.Row="1" Text="浏览" Style="{ThemeResource SubheaderTextBlockStyle}" FontSize="20" Margin="10"/>
                 <Grid Grid.Row="2" x:Name="ContentRoot">
                     <Grid.ColumnDefinitions>

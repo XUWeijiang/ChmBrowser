@@ -327,11 +327,6 @@ namespace ChmBrowser
     /// </summary>
     public sealed class ChmStreamUriTResolver : IUriToStreamResolver
     {
-        private static byte[] _injectedContent = Encoding.UTF8.GetBytes
-            ("<style type='text/css'>*{-ms-text-size-adjust:auto;}</style>" + 
-            "<script type='text/javascript'>function setScale(scale){document.styleSheets[document.styleSheets.length - 1].rules[0].style.cssText='-ms-text-size-adjust:'+scale;}</script>"
-            );
-
         private string _scale;
         
         public ChmStreamUriTResolver(string scale = "auto")
