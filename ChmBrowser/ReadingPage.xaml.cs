@@ -34,7 +34,7 @@ namespace ChmBrowser
     {
         private Mutex _mutex = new Mutex();
         private Uri _lastWebViewUrl;
-
+        private ChmStreamUriTResolver _uriResolver;
         public ReadingPage()
         {
             this.InitializeComponent();
@@ -45,6 +45,7 @@ namespace ChmBrowser
             webView.NavigationStarting += webView_NavigationStarting;
             scaleSlider.ValueChanged += scaleSlider_ValueChanged;
             isAutoZoom.Toggled += isAutoZoom_Toggled;
+            _uriResolver = new ChmStreamUriTResolver();
         }
 
         async void Current_Suspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
@@ -128,6 +129,7 @@ namespace ChmBrowser
             scaleSlider.ValueChanged -= scaleSlider_ValueChanged;
             isAutoZoom.Toggled -= isAutoZoom_Toggled;
             ResetSetting();
+            _uriResolver.SetScale(zoomIndicator.Text);
             scaleSlider.ValueChanged += scaleSlider_ValueChanged;
             isAutoZoom.Toggled += isAutoZoom_Toggled;
             
@@ -167,6 +169,7 @@ namespace ChmBrowser
             }
             else
             {
+                webView.Stop();
                 NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Disabled;
             }
             
@@ -201,7 +204,7 @@ namespace ChmBrowser
                 if (_lastWebViewUrl != url || _lastWebViewUrl.Fragment != url.Fragment)
                 {
                     webView.Stop();
-                    webView.NavigateToLocalStreamUri(url, new ChmStreamUriTResolver(zoomIndicator.Text));
+                    webView.NavigateToLocalStreamUri(url, _uriResolver);
                     await ChmFile.CurrentFile.Save();
                 }
             }
@@ -236,6 +239,7 @@ namespace ChmBrowser
                 {
                     value = "auto";
                 }
+                _uriResolver.SetScale(value);
                 await webView.InvokeScriptAsync("setScale", new string[]{value});
             }
             catch
@@ -328,15 +332,21 @@ namespace ChmBrowser
     /// </summary>
     public sealed class ChmStreamUriTResolver : IUriToStreamResolver
     {
-        private string _scale;
+        private volatile string _scale;
         
         public ChmStreamUriTResolver(string scale = "auto")
         {
             _scale = scale;
         }
 
+        public void SetScale(string scale)
+        {
+            _scale = scale;
+        }
+
         private byte[] GetInjectedContent()
         {
+            // *{word-wrap:break-word;} pre {white-space:pre-wrap;}
             return Encoding.UTF8.GetBytes
             ("<style type='text/css'>*{-ms-text-size-adjust:"+ _scale + ";}</style>" +
             "<script type='text/javascript'>function setScale(scale){document.styleSheets[document.styleSheets.length - 1].rules[0].style.cssText='-ms-text-size-adjust:'+scale +';';" + 

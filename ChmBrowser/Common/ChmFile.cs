@@ -36,11 +36,7 @@ namespace ChmBrowser.Common
                     FileHistory.UpdateHistoryWhenOpenFile(value.Key);
                     if (_currentFile != null)
                     {
-                        if (_currentFile.Chm != null)
-                        {
-                            _currentFile.Chm.Dispose();
-                            _currentFile.Chm = null;
-                        }
+                        _currentFile.Chm = null;
                     }
                 }
                 _currentFile = value;
@@ -219,6 +215,15 @@ namespace ChmBrowser.Common
             return false;
         }
 
+        public static async Task<Chm> LoadChm(string path)
+        {
+            return await Task.Run(() =>
+            {
+                Chm chm = new Chm(path);
+                return chm;
+            });
+        }
+
         private ChmFile()
         {
             Current = 0;
@@ -233,15 +238,6 @@ namespace ChmBrowser.Common
         public bool HasThumbnail { get; private set; }
 
         private bool _isSaving = false;
-
-        public static async Task<Chm> LoadChm(string path)
-        {
-            return await Task.Run(() =>
-                {
-                    Chm chm = new Chm(path); 
-                    return chm;
-                });
-        }
 
         public async Task<byte[]> GetData(string path)
         {

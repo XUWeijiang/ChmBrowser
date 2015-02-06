@@ -45,12 +45,6 @@ namespace ChmCore
         }
     public:
         Chm(Platform::String^ file);
-        virtual ~Chm()
-        {
-            doc_.reset();
-            Contents->Clear();
-            Contents = nullptr;
-        }
     public:
         Platform::Array<byte>^ GetData(Platform::String^ path);
         bool HasData(Platform::String^ path);
