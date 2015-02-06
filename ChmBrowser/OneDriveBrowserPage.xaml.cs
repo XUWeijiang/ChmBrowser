@@ -118,14 +118,15 @@ namespace ChmBrowser
                             this.progressBar.Value = progress.ProgressPercentage;
                         });
                     var ctsDownload = new System.Threading.CancellationToken();
-                    if (await ChmFile.OpenChmFileFromOneDrive(_client, progressHandler, ctsDownload, entry.Id, entry.Name, oneDrivePath.Text))
+                    string key = await ChmFile.SetupChmFileFromOneDrive(_client, progressHandler, ctsDownload, entry.Id, entry.Name, oneDrivePath.Text);
+                    if (key != null)
                     {
                         Frame.GoBack();
-                        Frame.Navigate(typeof(ReadingPage));
+                        Frame.Navigate(typeof(ReadingPage), key);
                     }
                     else
                     {
-                        MessageDialog msg = new MessageDialog(string.Format("{0}: Invalid File", entry.Name));
+                        MessageDialog msg = new MessageDialog(string.Format(App.Localizer.GetString("InvalidFile"), entry.Name));
                         await msg.ShowAsync();
                     }
                 }

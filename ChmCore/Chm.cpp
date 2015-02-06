@@ -33,8 +33,12 @@ public:
         contents_->Append(newTopic);
     }
 };
-
-Chm::Chm(Platform::String^ file)
+bool Chm::IsValidChmFile(Platform::String^ file)
+{
+    std::unique_ptr<ChmDoc> doc(ChmDoc::CreateFromFile(file->Data()));
+    return doc != nullptr;
+}
+Chm::Chm(Platform::String^ file, bool loadOutline)
 {
     file_ = file;
     doc_.reset(ChmDoc::CreateFromFile(file->Data()));
@@ -42,15 +46,18 @@ Chm::Chm(Platform::String^ file)
     {
         throw ref new Platform::FailureException();
     }
-    try
+    if (loadOutline)
     {
-        EbookTocExtractor holder;
-        doc_->ParseToc(&holder);
-        Contents = holder.GetContents();
-    }
-    catch (...)
-    {
-        Contents = nullptr;
+        try
+        {
+            EbookTocExtractor holder;
+            doc_->ParseToc(&holder);
+            Contents = holder.GetContents();
+        }
+        catch (...)
+        {
+            Contents = nullptr;
+        }
     }
     WCHAR* title = doc_->GetProperty(DocumentProperty::Prop_Title);
     if (title != nullptr)

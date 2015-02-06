@@ -96,7 +96,10 @@ namespace ChmBrowser.Common
                 }
             }
         }
-
+        public static void AddToHistory(string name)
+        {
+            UpdateHistoryWhenOpenFile(name);
+        }
         public static void UpdateHistoryWhenOpenFile(string name)
         {
             IList<string> historyList = GetHistory();

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
@@ -35,6 +36,7 @@ namespace ChmBrowser
         private Mutex _mutex = new Mutex();
         private Uri _lastWebViewUrl;
         private ChmStreamUriTResolver _uriResolver;
+        private ChmFile _chmFile;
 
         public ReadingPage()
         {
@@ -46,14 +48,13 @@ namespace ChmBrowser
             webView.NavigationStarting += webView_NavigationStarting;
             scaleSlider.ValueChanged += scaleSlider_ValueChanged;
             isAutoZoom.Toggled += isAutoZoom_Toggled;
-            _uriResolver = new ChmStreamUriTResolver();
         }
 
         async void Current_Suspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
         {
-            if (ChmFile.CurrentFile != null)
+            if (_chmFile != null)
             {
-                await ChmFile.CurrentFile.Save();
+                await _chmFile.Save();
             }
         }
 
@@ -76,7 +77,7 @@ namespace ChmBrowser
             if (args.Uri.Scheme == "ms-local-stream")
             {
                 string path = args.Uri.AbsolutePath + args.Uri.Fragment;
-                await ChmFile.CurrentFile.SetCurrent(path);
+                await _chmFile.SetCurrent(path);
 
                 // Uncomment to capture thumbnail.
                 //if (!ChmFile.CurrentFile.HasThumbnail)
@@ -102,20 +103,28 @@ namespace ChmBrowser
                 commandBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
                 progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 root.Children.Remove(settingRoot);
-                await ChmFile.CurrentFile.Save();
+                await _chmFile.Save();
             }
             else
             {
-                if (Frame.CanGoBack)
-                {
-                    Frame.GoBack();
-                }
-                else
-                {
-                    Frame.Navigate(typeof(MainPage));
-                }
+                LeavePage();
             }
         }
+
+        private void LeavePage()
+        {
+            if (Frame.CanGoBack && Frame.BackStack[Frame.BackStack.Count - 1].SourcePageType == typeof(MainPage))
+            {
+                Frame.GoBack();
+            }
+            else
+            {
+                Frame.Navigate(typeof(MainPage));
+            }
+        }
+
+        // A contract between ReadingPage & ContentPage to feed data to from ReadingPage to ContentPage.
+        public static ChmFile SharedChmFile { get; private set; }
 
         /// <summary>
         /// Invoked when this page is about to be displayed in a Frame.
@@ -124,13 +133,28 @@ namespace ChmBrowser
         /// This parameter is typically used to configure the page.</param>
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
+            SharedChmFile = null;
+            if (e.Parameter == null)
+            {
+                LeavePage();
+            }
+            if (_chmFile == null || _chmFile.Key != e.Parameter.ToString())
+            {
+                progressBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                _chmFile = await ChmFile.OpenLocalChmFile(e.Parameter.ToString());
+                progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            }
+            if (_chmFile == null)
+            {
+                LeavePage();
+            }
             HardwareButtons.BackPressed += HardwareButtons_BackPressed;
             Application.Current.Suspending += Current_Suspending;
 
             scaleSlider.ValueChanged -= scaleSlider_ValueChanged;
             isAutoZoom.Toggled -= isAutoZoom_Toggled;
             ResetSetting();
-            _uriResolver.SetScale(zoomIndicator.Text);
+            _uriResolver = new ChmStreamUriTResolver(_chmFile, zoomIndicator.Text);
             scaleSlider.ValueChanged += scaleSlider_ValueChanged;
             isAutoZoom.Toggled += isAutoZoom_Toggled;
             
@@ -140,7 +164,7 @@ namespace ChmBrowser
             progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             root.Children.Remove(settingRoot);
 
-            if (!ChmFile.CurrentFile.HasOutline)
+            if (!_chmFile.HasOutline)
             {
                 foreach(var x in commandBar.PrimaryCommands)
                 {
@@ -166,10 +190,12 @@ namespace ChmBrowser
 
             if (e.SourcePageType == typeof(ContentPage))
             {
+                SharedChmFile = _chmFile;
                 NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Required;
             }
             else
             {
+                SharedChmFile = null;
                 webView.Stop();
                 NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Disabled;
             }
@@ -185,28 +211,28 @@ namespace ChmBrowser
 
         private async void Next_Click(object sender, RoutedEventArgs e)
         {
-            if (await ChmFile.CurrentFile.SetNext())
+            if (await _chmFile.SetNext())
             {
                 await UpdateReading();
             }
         }
         private async void Previous_Click(object sender, RoutedEventArgs e)
         {
-            if (await ChmFile.CurrentFile.SetPrevious())
+            if (await _chmFile.SetPrevious())
             {
                 await UpdateReading();
             }
         }
         private async Task UpdateReading()
         {
-            if (!string.IsNullOrEmpty(ChmFile.CurrentFile.CurrentPath))
+            if (!string.IsNullOrEmpty(_chmFile.CurrentPath))
             {
-                Uri url = webView.BuildLocalStreamUri("MyTag", ChmFile.CurrentFile.CurrentPath);
+                Uri url = webView.BuildLocalStreamUri("MyTag", _chmFile.CurrentPath);
                 if (_lastWebViewUrl != url || _lastWebViewUrl.Fragment != url.Fragment)
                 {
                     webView.Stop();
                     webView.NavigateToLocalStreamUri(url, _uriResolver);
-                    await ChmFile.CurrentFile.Save();
+                    await _chmFile.Save();
                 }
             }
         }
@@ -248,9 +274,9 @@ namespace ChmBrowser
                 // ignore error
             }
         }
-        private static string GetStandardScale(out double v)
+        private static string GetStandardScale(ChmFile chmFile, out double v)
         {
-            string scale = ChmFile.CurrentFile.ChmMeta.GetScale();
+            string scale = chmFile.ChmMeta.GetScale();
             if (string.IsNullOrEmpty(scale))
             {
                 v = 1;
@@ -277,7 +303,7 @@ namespace ChmBrowser
         private void ResetSetting()
         {
             double v;
-            string scale = GetStandardScale(out v);
+            string scale = GetStandardScale(_chmFile, out v);
             
             if (scale == "auto")
             {
@@ -298,27 +324,27 @@ namespace ChmBrowser
             if (isAutoZoom.IsOn)
             {
                 scaleSlider.IsEnabled = false;
-                ChmFile.CurrentFile.ChmMeta.SetScale("-" + scaleSlider.Value.ToString());
+                _chmFile.ChmMeta.SetScale("-" + scaleSlider.Value.ToString());
                 zoomIndicator.Text = "auto";
             }
             else
             {
                 scaleSlider.IsEnabled = true;
-                ChmFile.CurrentFile.ChmMeta.SetScale(scaleSlider.Value.ToString());
+                _chmFile.ChmMeta.SetScale(scaleSlider.Value.ToString());
                 zoomIndicator.Text = (scaleSlider.Value * 100).ToString("0") + "%";
             }
             await SetScale(zoomIndicator.Text);
-            await ChmFile.CurrentFile.Save();
+            await _chmFile.Save();
         }
 
         private async void scaleSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
             if (scaleSlider.IsEnabled)
             {
-                ChmFile.CurrentFile.ChmMeta.SetScale(scaleSlider.Value.ToString());
+                _chmFile.ChmMeta.SetScale(scaleSlider.Value.ToString());
                 zoomIndicator.Text = (scaleSlider.Value * 100).ToString("0") + "%";
                 await SetScale(zoomIndicator.Text);
-                await ChmFile.CurrentFile.Save();
+                await _chmFile.Save();
             }
         }
     }
@@ -334,9 +360,11 @@ namespace ChmBrowser
     public sealed class ChmStreamUriTResolver : IUriToStreamResolver
     {
         private volatile string _scale;
-        
-        public ChmStreamUriTResolver(string scale = "auto")
+        private WeakReference<ChmFile> _chmFile;
+
+        public ChmStreamUriTResolver(ChmFile chmFile, string scale = "auto")
         {
+            _chmFile = new WeakReference<ChmFile>(chmFile);
             _scale = scale;
         }
 
@@ -384,7 +412,12 @@ namespace ChmBrowser
         /// <returns></returns>
         private async Task<IInputStream> getContent(string path)
         {
-            byte[] data = await ChmFile.CurrentFile.GetData(path);
+            ChmFile obj;
+            if (!_chmFile.TryGetTarget(out obj))
+            {
+                throw new Exception();
+            }
+            byte[] data = await obj.GetData(path);
             if (data == null || data.Length == 0)
             {
                 throw new Exception();

@@ -51,9 +51,9 @@ namespace ChmBrowser
         {
             Color defaultBackground = (Color)App.Current.Resources["PhoneBackgroundColor"];
             progressBarGrid.Background = new SolidColorBrush(Color.FromArgb(0x30, defaultBackground.R, defaultBackground.G, defaultBackground.B));
-            ChmFile.CloseChmFile();
             LoadIconListView();
-            Frame.BackStack.Clear(); // a new start...
+            Frame.BackStack.Clear();
+
             if (e.NavigationMode == NavigationMode.New && e.Parameter != null && !string.IsNullOrEmpty(e.Parameter.ToString()))
             {
                 await OpenLocalChmFile(e.Parameter.ToString()); // Navigate to ReadingPage
@@ -62,14 +62,6 @@ namespace ChmBrowser
             {
                 _history.Entries = await FileHistory.GetHistoryEntriesInfo(); // stay in this page.
             }
-            
-            // TODO: Prepare page for display here.
-
-            // TODO: If your application contains multiple pages, ensure that you are
-            // handling the hardware Back button by registering for the
-            // Windows.Phone.UI.Input.HardwareButtons.BackPressed event.
-            // If you are using the NavigationHelper provided by some templates,
-            // this event is handled for you.
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -88,15 +80,15 @@ namespace ChmBrowser
                 try
                 {
                     SetProgressString(App.Localizer.GetString("Copying"));
-                    bool success = await ChmFile.OpenChmFileFromPhone(args.Files[0]);
-                    if (!success) // failed
+                    string key = await ChmFile.SetupChmFileFromPhone(args.Files[0]);
+                    if (key == null) // failed
                     {
                         MessageDialog msg = new MessageDialog(string.Format(App.Localizer.GetString("InvalidFile"), args.Files[0].Path));
                         await msg.ShowAsync();
                     }
                     else
                     {
-                        Frame.Navigate(typeof(ReadingPage));
+                        Frame.Navigate(typeof(ReadingPage), key);
                     }
                 }
                 finally
@@ -114,33 +106,8 @@ namespace ChmBrowser
 
         private async Task OpenLocalChmFile(string key)
         {
-            StartProcessing();
-            try
-            {
-                SetProgressString(App.Localizer.GetString("Opening"));
-                bool success = await ChmFile.OpenLocalChmFile(key);
-                if (!success) // failed
-                {
-                    MessageDialog msg = new MessageDialog(string.Format(App.Localizer.GetString("InvalidFile"), key));
-                    await msg.ShowAsync();
-                }
-                else
-                {
-                    // update old name (created by older version) when open file.
-                    foreach (var entry in _history.Entries)
-                    {
-                        if (entry.Key == key)
-                        {
-                            entry.Name = ChmFile.CurrentFile.ChmMeta.GetDisplayName();
-                        }
-                    }
-                    Frame.Navigate(typeof(ReadingPage));
-                }
-            }
-            finally
-            {
-                StopProcessing();
-            }
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, 
+                ()=>Frame.Navigate(typeof(ReadingPage), key));
         }
 
         private void ItemGridView_Holding(object sender, HoldingRoutedEventArgs e)

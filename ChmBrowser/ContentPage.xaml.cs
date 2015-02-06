@@ -28,7 +28,7 @@ namespace ChmBrowser
     /// </summary>
     public sealed partial class ContentPage : Page
     {
-        private WeakReference<ChmCore.Chm> chmWeak_ = new WeakReference<Chm>(null);
+        private WeakReference<ChmFile> chmWeak_ = new WeakReference<ChmFile>(null);
         private TopcisInfo _topics = new TopcisInfo();
 
         public ContentPage()
@@ -36,27 +36,35 @@ namespace ChmBrowser
             this.InitializeComponent();
             this.DataContext = _topics;
             this.NavigationCacheMode = NavigationCacheMode.Required;
-            this.Loaded += ContentPage_Loaded;
-            //outlineControl.SelectedNodeChanged += outlineControl_SelectedNodeChanged;   
+            this.Loaded += ContentPage_Loaded;  
         }
 
         void ContentPage_Loaded(object sender, RoutedEventArgs e)
         {
-            _topics.SelectTopic(ChmFile.CurrentFile.CurrentPath);
-            ScrollToView();
+            ChmFile obj;
+            if (chmWeak_.TryGetTarget(out obj))
+            {
+                _topics.SelectTopic(obj.CurrentPath);
+                ScrollToView();
+            }
         }
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            Chm obj;
-            if (chmWeak_.TryGetTarget(out obj) && obj == ChmFile.CurrentFile.Chm)
+            if (ReadingPage.SharedChmFile == null || ReadingPage.SharedChmFile.Chm == null)
+            {
+                Frame.GoBack();
+                return;
+            }
+            ChmFile obj;
+            if (chmWeak_.TryGetTarget(out obj) && obj == ReadingPage.SharedChmFile)
             {
                 // do nothing
             }
             else
             {
-                chmWeak_ = new WeakReference<Chm>(ChmFile.CurrentFile.Chm);
-                _topics.RefreshTopcisInfo();
-                bookNameBlock.Text = ChmFile.CurrentFile.ChmMeta.GetDisplayName();
+                chmWeak_ = new WeakReference<ChmFile>(ReadingPage.SharedChmFile);
+                _topics.RefreshTopcisInfo(ReadingPage.SharedChmFile);
+                bookNameBlock.Text = ReadingPage.SharedChmFile.ChmMeta.GetDisplayName();
             }
         }
 
@@ -89,7 +97,11 @@ namespace ChmBrowser
 
         private async void tbTopic_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            await ChmFile.CurrentFile.SetCurrent((((TextBlock)sender).DataContext as TopicInfo).TopicId);
+            ChmFile obj;
+            if (chmWeak_.TryGetTarget(out obj))
+            {
+                await obj.SetCurrent((((TextBlock)sender).DataContext as TopicInfo).TopicId);
+            }
             Frame.GoBack();
         }
     }

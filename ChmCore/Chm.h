@@ -44,10 +44,12 @@ namespace ChmCore
             Platform::String^ get() { return home_; }
         }
     public:
-        Chm(Platform::String^ file);
+        Chm(Platform::String^ file, bool loadOutline);
     public:
         Platform::Array<byte>^ GetData(Platform::String^ path);
         bool HasData(Platform::String^ path);
+    public:
+        static bool IsValidChmFile(Platform::String^ file);
     private:
         std::unique_ptr<ChmDoc> doc_;
     };

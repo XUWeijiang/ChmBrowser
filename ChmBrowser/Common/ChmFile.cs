@@ -20,28 +20,7 @@ namespace ChmBrowser.Common
     public class ChmFile
     {
         public const string ChmFileExtension = ".chm";
-        
 
-        private static ChmFile _currentFile;
-        public static ChmFile CurrentFile 
-        { 
-            get
-            {
-                return _currentFile;
-            }
-            private set
-            {
-                if (value != null)
-                {
-                    FileHistory.UpdateHistoryWhenOpenFile(value.Key);
-                    if (_currentFile != null)
-                    {
-                        _currentFile.Chm = null;
-                    }
-                }
-                _currentFile = value;
-            }
-        }
         public static async Task<bool> ContainsFile(string key)
         {
             Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
@@ -70,12 +49,7 @@ namespace ChmBrowser.Common
             }
         }
 
-        public static void CloseChmFile()
-        {
-            CurrentFile = null;
-        }
-
-        public static async Task<bool> OpenChmFileFromOneDrive(LiveConnectClient client, 
+        public static async Task<string> SetupChmFileFromOneDrive(LiveConnectClient client, 
             IProgress<LiveOperationProgress> progressHandler,
             System.Threading.CancellationToken ctoken,
             string id, string name, string path)
@@ -90,7 +64,7 @@ namespace ChmBrowser.Common
             
             try
             {
-                ret.Chm = await LoadChm(file.Path);
+                ret.Chm = await LoadChm(file.Path, false);
                 MetaInfo meta = new MetaInfo();
                 meta.SetOriginalPath(path);
                 if (ret.Chm.Title != null)
@@ -102,8 +76,8 @@ namespace ChmBrowser.Common
                     meta.SetDisplayName(System.IO.Path.GetFileNameWithoutExtension(name));
                 }
                 ret.ChmMeta = meta;
-                await ret.SetCurrent(ret.Chm.Home);
                 await ret.Save();
+                FileHistory.AddToHistory(ret.Key);
             }
             catch
             {
@@ -113,13 +87,12 @@ namespace ChmBrowser.Common
             {
                 await MetaInfo.DeleteMetaFile(ret.Key);
                 await DeleteFile(ret.Key);
-                return false;
+                return null;
             }
-            CurrentFile = ret;
-            return true;
+            return ret.Key;
         }
 
-        public static async Task<bool> OpenChmFileFromPhone(IStorageFile storageFile)
+        public static async Task<string> SetupChmFileFromPhone(IStorageFile storageFile)
         {
             ChmFile ret = new ChmFile();
             Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
@@ -128,7 +101,7 @@ namespace ChmBrowser.Common
             var file = await storageFile.CopyAsync(localFolder, ret.Key + ChmFileExtension);
             try
             {
-                ret.Chm = await LoadChm(file.Path);
+                ret.Chm = await LoadChm(file.Path, false);
                 MetaInfo meta = new MetaInfo();
                 meta.SetOriginalPath(storageFile.Path);
                 if (ret.Chm.Title != null)
@@ -140,8 +113,8 @@ namespace ChmBrowser.Common
                     meta.SetDisplayName(System.IO.Path.GetFileNameWithoutExtension(storageFile.Name));
                 }
                 ret.ChmMeta = meta;
-                await ret.SetCurrent(ret.Chm.Home);
                 await ret.Save();
+                FileHistory.AddToHistory(ret.Key);
             }
             catch
             {
@@ -151,17 +124,16 @@ namespace ChmBrowser.Common
             {
                 await MetaInfo.DeleteMetaFile(ret.Key);
                 await DeleteFile(ret.Key);
-                return false;
+                return null;
             }
-            CurrentFile = ret;
-            return true;
+            return ret.Key;
         }
 
-        public static async Task<bool> OpenLocalChmFile(EntryInfo entry)
+        public static async Task<ChmFile> OpenLocalChmFile(EntryInfo entry)
         {
             return await OpenLocalChmFile(entry.Key);
         }
-        public static async Task<bool> OpenLocalChmFile(string key)
+        public static async Task<ChmFile> OpenLocalChmFile(string key)
         {
             try
             {
@@ -169,7 +141,7 @@ namespace ChmBrowser.Common
                 ChmFile ret = new ChmFile();
                 ret.Key = key;
                 var file = await localFolder.GetFileAsync(key + ChmFileExtension);
-                ret.Chm = await LoadChm(file.Path);
+                ret.Chm = await LoadChm(file.Path, true);
                 ret.ChmMeta = await MetaInfo.ReadMetaInfo(key);
                 ret.HasThumbnail = await Snapshot.HasSnapshot(key);
                 if (ret.Chm.Title != null)
@@ -197,21 +169,21 @@ namespace ChmBrowser.Common
                 {
                     await ret.SetCurrent(ret.ChmMeta.GetLast());
                 }
-                CurrentFile = ret;
-                return true;
+                FileHistory.UpdateHistoryWhenOpenFile(ret.Key);
+                return ret;
             }
             catch
             {
             }
             await FileHistory.DeleteFromHistory(key);
-            return false;
+            return null;
         }
 
-        public static async Task<Chm> LoadChm(string path)
+        public static async Task<Chm> LoadChm(string path, bool loadOutline)
         {
             return await Task.Run(() =>
             {
-                Chm chm = new Chm(path);
+                Chm chm = new Chm(path, loadOutline);
                 return chm;
             });
         }

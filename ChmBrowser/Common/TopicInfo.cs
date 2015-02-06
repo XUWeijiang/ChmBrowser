@@ -16,9 +16,42 @@ namespace ChmBrowser.Common
     {
         private bool _isSelected = false;
 
-        public string Topic { get { return ChmFile.CurrentFile.Chm.Contents[TopicId].Name; } }
-        public int Level { get { return ChmFile.CurrentFile.Chm.Contents[TopicId].Level; } }
-        public string Url { get { return ChmFile.CurrentFile.Chm.Contents[TopicId].Url; } }
+        public string Topic 
+        { 
+            get 
+            {
+                ChmFile obj;
+                if (chmWeak_.TryGetTarget(out obj))
+                {
+                    return obj.Chm.Contents[TopicId].Name;
+                }
+                return string.Empty;
+            } 
+        }
+        public int Level 
+        { 
+            get 
+            {
+                ChmFile obj;
+                if (chmWeak_.TryGetTarget(out obj))
+                {
+                    return obj.Chm.Contents[TopicId].Level;
+                }
+                return 0;
+            } 
+        }
+        public string Url 
+        { 
+            get 
+            {
+                ChmFile obj;
+                if (chmWeak_.TryGetTarget(out obj))
+                {
+                    return obj.Chm.Contents[TopicId].Url;
+                }
+                return string.Empty;
+            } 
+        }
         public bool IsSelected 
         {
             get { return _isSelected; }
@@ -55,9 +88,11 @@ namespace ChmBrowser.Common
                 }
             }
         }
+        private WeakReference<ChmFile> chmWeak_;
 
-        public TopicInfo(int topicId)
+        public TopicInfo(ChmFile chmFile, int topicId)
         {
+            chmWeak_ = new WeakReference<ChmFile>(chmFile);
             IsSelected = false;
             TopicId = topicId;
         }
@@ -136,12 +171,17 @@ namespace ChmBrowser.Common
             }
         }
 
-        public void RefreshTopcisInfo()
+        public void RefreshTopcisInfo(ChmFile chmFile)
         {
-            IList<TopicInfo> entries = new List<TopicInfo>();
-            for(int i = 0; i < ChmFile.CurrentFile.Chm.Contents.Count; ++i)
+            if (chmFile == null || !chmFile.HasOutline)
             {
-                entries.Add(new TopicInfo(i));
+                Topics = new List<TopicInfo>();
+                return;
+            }
+            IList<TopicInfo> entries = new List<TopicInfo>();
+            for (int i = 0; i < chmFile.Chm.Contents.Count; ++i)
+            {
+                entries.Add(new TopicInfo(chmFile, i));
             }
             Topics = entries;
         }
