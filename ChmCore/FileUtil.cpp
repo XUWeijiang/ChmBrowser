@@ -299,7 +299,7 @@ namespace file {
 
 HANDLE OpenReadOnly(const WCHAR *filePath)
 {
-    return CreateFile2(filePath, GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING, nullptr);
+    return CreateFile2(filePath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_DELETE, OPEN_EXISTING, nullptr);
 }
 
 bool Exists(const WCHAR *filePath)
@@ -393,7 +393,7 @@ bool ReadN(const WCHAR *filePath, char *buf, size_t toRead)
 
 bool WriteAll(const WCHAR *filePath, const void *data, size_t dataLen)
 {
-    ScopedHandle h(CreateFile2(filePath, GENERIC_WRITE, FILE_SHARE_READ, CREATE_ALWAYS, nullptr));
+    ScopedHandle h(CreateFile2(filePath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, CREATE_ALWAYS, nullptr));
     if (INVALID_HANDLE_VALUE == h)
         return false;
 

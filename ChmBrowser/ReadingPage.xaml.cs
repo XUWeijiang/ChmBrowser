@@ -35,6 +35,7 @@ namespace ChmBrowser
         private Mutex _mutex = new Mutex();
         private Uri _lastWebViewUrl;
         private ChmStreamUriTResolver _uriResolver;
+
         public ReadingPage()
         {
             this.InitializeComponent();

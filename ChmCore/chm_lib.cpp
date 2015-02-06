@@ -809,7 +809,7 @@ struct chmFile *chm_open(const wchar_t *filename)
 #else
     if ((newHandle->fd=CreateFile2(filename,
                                    GENERIC_READ,
-                                   FILE_SHARE_READ,
+                                   FILE_SHARE_READ | FILE_SHARE_DELETE,
                                    OPEN_EXISTING,
                                    NULL)) == CHM_NULL_FD)
     {

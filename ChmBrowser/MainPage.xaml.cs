@@ -205,6 +205,7 @@ namespace ChmBrowser
             }
             _history.Entries = await FileHistory.GetHistoryEntriesInfo();
         }
+
         private async void pinItem_Click(object sender, RoutedEventArgs e)
         {
             EntryInfo info = ((FrameworkElement)sender).DataContext as EntryInfo;
@@ -222,6 +223,7 @@ namespace ChmBrowser
                 await st.RequestCreateAsync();
             }
         }
+
         private void GoAbout_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(AboutPage));
@@ -232,11 +234,13 @@ namespace ChmBrowser
             SetIconListView(sender == listButton);
             SaveIconListView();
         }
+
         private void SaveIconListView()
         {
             var setting = Windows.Storage.ApplicationData.Current.LocalSettings;
             setting.Values["item_view"] = listButton.Visibility == Windows.UI.Xaml.Visibility.Collapsed?"list":"icon";
         }
+
         private void LoadIconListView()
         {
             var setting = Windows.Storage.ApplicationData.Current.LocalSettings;
@@ -244,21 +248,25 @@ namespace ChmBrowser
             bool isIcon = !setting.Values.TryGetValue("item_view", out value) || value.ToString() == "icon";
             SetIconListView(!isIcon);
         }
+
         private void StartProcessing()
         {
             SetProgressString("");
             progressBarGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
             //LayoutRoot.IsHitTestVisible = false;
         }
+
         private void StopProcessing()
         {
             progressBarGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             //LayoutRoot.IsHitTestVisible = true;
         }
+
         private void SetProgressString(string value)
         {
             progressMessage.Text = value;
         }
+
         private void SetIconListView(bool isList)
         {
             if (isList)

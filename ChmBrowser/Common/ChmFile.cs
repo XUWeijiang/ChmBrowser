@@ -107,11 +107,7 @@ namespace ChmBrowser.Common
             }
             catch
             {
-                if (ret.Chm != null)
-                {
-                    ret.Chm.Dispose();
-                    ret.Chm = null;
-                }
+                ret.Chm = null;
             }
             if (ret.Chm == null)
             {
@@ -149,11 +145,7 @@ namespace ChmBrowser.Common
             }
             catch
             {
-                if (ret.Chm != null)
-                {
-                    ret.Chm.Dispose();
-                    ret.Chm = null;
-                }
+                ret.Chm = null;
             }
             if (ret.Chm == null)
             {
