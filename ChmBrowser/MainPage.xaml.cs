@@ -61,6 +61,10 @@ namespace ChmBrowser
             else
             {
                 _history.Entries = await FileHistory.GetHistoryEntriesInfo(); // stay in this page.
+                if (e.NavigationMode == NavigationMode.New)
+                {
+                    await FileHistory.CleanStorage(_history.Entries.Select(x => x.Key)); // try to remove files that doesn't in history (didn't delete successfully before)
+                }
             }
         }
 

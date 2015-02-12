@@ -28,6 +28,26 @@ namespace ChmBrowser.Common
             }
             return history.ToString().Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
         }
+        public static async Task CleanStorage(IEnumerable<string> validKeys)
+        {
+            try
+            {
+                HashSet<string> keys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                keys.UnionWith(validKeys);
+                Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+                var files = await localFolder.GetFilesAsync();
+
+                foreach (var f in files)
+                {
+                    if (!keys.Contains(System.IO.Path.GetFileNameWithoutExtension(f.Path)))
+                    {
+                        await f.DeleteAsync();
+                    }
+                }
+            }
+            catch // nothrow
+            { }
+        }
         public static async Task<IList<EntryInfo>> GetHistoryEntriesInfo()
         {
             Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;

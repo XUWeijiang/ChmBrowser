@@ -38,17 +38,23 @@
     <Page.BottomAppBar>
         <CommandBar x:Name="commandBar">
             <CommandBar.PrimaryCommands>
-                <AppBarButton x:Uid="Previous" Label="上一章" Click="Previous_Click" Icon="Back">
+                <AppBarButton x:Uid="Previous" x:Name="previousButton" Label="上一章" Click="Previous_Click" Icon="Back" Tag="1">
                 </AppBarButton>
-                <AppBarButton x:Uid="ContentsButton" Label="目录" Click="Contents_Click" Icon="AlignLeft">
+                <AppBarButton x:Uid="ContentsButton" Label="目录" Click="Contents_Click" Icon="AlignLeft" Tag="1">
                 </AppBarButton>
-                <AppBarButton x:Uid="Next" Label="下一章" Click="Next_Click" Icon="Forward">
+                <AppBarButton x:Uid="Next" x:Name="nextButton" Label="下一章" Click="Next_Click" Icon="Forward" Tag="1">
+                </AppBarButton>
+                <AppBarButton x:Uid="GoBack" Label="后退" IsEnabled="{Binding CanGoBack, ElementName=webView}" Click="GoBack_Click" Icon="Back" Tag="2">
+                </AppBarButton>
+                <AppBarButton x:Uid="Home" Label="首页" Click="Home_Click" Icon="Home" Tag="2">
+                </AppBarButton>
+                <AppBarButton x:Uid="GoForward" Label="前进" IsEnabled="{Binding ElementName=webView, Path=CanGoForward}" Click="GoForward_Click" Icon="Forward" Tag="2">
                 </AppBarButton>
             </CommandBar.PrimaryCommands>
             <CommandBar.SecondaryCommands>
-                <AppBarButton x:Uid="GoBack" Label="后退" Click="GoBack_Click"/>
-                <AppBarButton x:Uid="GoForward" Label="前进" Click="GoForward_Click"/>
-                <AppBarButton x:Uid="Settings" Label="设置..." Click="GoSetting_Click"/>
+                <AppBarButton x:Uid="GoBack" Label="后退" IsEnabled="{Binding ElementName=webView, Path=CanGoBack}" Click="GoBack_Click" Tag="1"/>
+                <AppBarButton x:Uid="GoForward" Label="前进" IsEnabled="{Binding ElementName=webView, Path=CanGoForward}" Click="GoForward_Click" Tag="1"/>
+                <AppBarButton x:Uid="Settings" Label="设置..." Click="GoSetting_Click" Tag="3"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>
     </Page.BottomAppBar>

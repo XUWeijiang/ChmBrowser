@@ -43,11 +43,31 @@ namespace ChmBrowser
             this.InitializeComponent();
             root.Children.Remove(settingRoot);
             this.NavigationCacheMode = NavigationCacheMode.Required;
+            this.Loaded += ReadingPage_Loaded;
             _lastWebViewUrl = null;
             webView.NavigationCompleted += webView_NavigationCompleted;
             webView.NavigationStarting += webView_NavigationStarting;
             scaleSlider.ValueChanged += scaleSlider_ValueChanged;
-            isAutoZoom.Toggled += isAutoZoom_Toggled;
+            isAutoZoom.Toggled += isAutoZoom_Toggled;            
+        }
+
+        void ReadingPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            // work around for binding in command bar
+            commandBar.DataContext = this;
+            foreach (var x in commandBar.PrimaryCommands.Concat(commandBar.SecondaryCommands))
+            {
+                var button = x as AppBarButton;
+                var binding = button.GetBindingExpression(AppBarButton.IsEnabledProperty);
+                if (binding != null && !string.IsNullOrEmpty(binding.ParentBinding.ElementName))
+                {
+                    button.SetBinding(AppBarButton.IsEnabledProperty, new Binding()
+                        {
+                            Source = FindName(binding.ParentBinding.ElementName),
+                            Path = binding.ParentBinding.Path
+                        });
+                }
+            }
         }
 
         async void Current_Suspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
@@ -141,8 +161,10 @@ namespace ChmBrowser
             if (_chmFile == null || _chmFile.Key != e.Parameter.ToString())
             {
                 progressBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                commandBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
                 _chmFile = await ChmFile.OpenLocalChmFile(e.Parameter.ToString());
                 progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                commandBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
             }
             if (_chmFile == null)
             {
@@ -164,21 +186,11 @@ namespace ChmBrowser
             progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             root.Children.Remove(settingRoot);
 
-            if (!_chmFile.HasOutline)
+            int mask = _chmFile.HasOutline ? 1 : 2;
+            foreach (var x in commandBar.PrimaryCommands.Concat(commandBar.SecondaryCommands))
             {
-                foreach(var x in commandBar.PrimaryCommands)
-                {
-                    (x as AppBarButton).Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                }
-                commandBar.ClosedDisplayMode = AppBarClosedDisplayMode.Minimal;
-            }
-            else
-            {
-                foreach (var x in commandBar.PrimaryCommands)
-                {
-                    (x as AppBarButton).Visibility = Windows.UI.Xaml.Visibility.Visible;
-                }
-                commandBar.ClosedDisplayMode = AppBarClosedDisplayMode.Compact;
+                int tag = Convert.ToInt32((x as AppBarButton).Tag);
+                (x as AppBarButton).Visibility = ((tag & mask) != 0) ? Windows.UI.Xaml.Visibility.Visible : Windows.UI.Xaml.Visibility.Collapsed;
             }
             await UpdateReading();
         }
@@ -223,20 +235,18 @@ namespace ChmBrowser
                 await UpdateReading();
             }
         }
-        private async Task UpdateReading()
+        private async Task UpdateReading(bool force = false)
         {
             if (!string.IsNullOrEmpty(_chmFile.CurrentPath))
             {
                 Uri url = webView.BuildLocalStreamUri("MyTag", _chmFile.CurrentPath);
-                if (_lastWebViewUrl != url || _lastWebViewUrl.Fragment != url.Fragment)
+                if (force || _lastWebViewUrl != url || _lastWebViewUrl.Fragment != url.Fragment)
                 {
-                    webView.Stop();
                     webView.NavigateToLocalStreamUri(url, _uriResolver);
                     await _chmFile.Save();
                 }
             }
         }
-
         private void GoBack_Click(object sender, RoutedEventArgs e)
         {
             if (webView.CanGoBack)
@@ -252,6 +262,12 @@ namespace ChmBrowser
                 webView.GoForward();
             }
         }
+        private async void Home_Click(object sender, RoutedEventArgs e)
+        {
+            await _chmFile.SetCurrent(_chmFile.Home);
+            await UpdateReading(true);
+        }
+        
         private void GoSetting_Click(object sender, RoutedEventArgs e)
         {
             root.Children.Add(settingRoot);

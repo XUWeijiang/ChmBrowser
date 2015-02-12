@@ -199,6 +199,7 @@ namespace ChmBrowser.Common
         public string CurrentPath { get; private set; }
         public MetaInfo ChmMeta { get; private set; }
         public string Key { get; private set; }
+        public string Home { get { return Chm.Home; } }
         public bool HasThumbnail { get; private set; }
 
         private bool _isSaving = false;

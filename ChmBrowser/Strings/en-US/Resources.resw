@@ -222,4 +222,7 @@
   <data name="Unpin.Text" xml:space="preserve">
     <value>unpin from start</value>
   </data>
+  <data name="Home.Label" xml:space="preserve">
+    <value>home</value>
+  </data>
 </root>

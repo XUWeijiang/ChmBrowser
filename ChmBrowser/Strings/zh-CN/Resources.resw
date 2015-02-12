@@ -222,4 +222,7 @@
   <data name="Unpin.Text" xml:space="preserve">
     <value>从开始屏幕删除</value>
   </data>
+  <data name="Home.Label" xml:space="preserve">
+    <value>首页</value>
+  </data>
 </root>
