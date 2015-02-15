@@ -190,10 +190,10 @@
     <value>正在打开文件...</value>
   </data>
   <data name="OpenSource.Text" xml:space="preserve">
-    <value>基于开源规则，我也正在整理代码。整理完成后会放到Github上去。</value>
+    <value>基于开源规则，我已经将代码放到Github上去了（搜索 ChmBrowser）。</value>
   </data>
-  <data name="PageZoom.Text" xml:space="preserve">
-    <value>页面缩放</value>
+  <data name="PageZoom.Header" xml:space="preserve">
+    <value>缩放</value>
   </data>
   <data name="Phone.Text" xml:space="preserve">
     <value>手机</value>
@@ -224,5 +224,29 @@
   </data>
   <data name="Home.Label" xml:space="preserve">
     <value>首页</value>
+  </data>
+  <data name="NightMode.Header" xml:space="preserve">
+    <value>夜间模式</value>
+  </data>
+  <data name="NightMode.OffContent" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="NightMode.OnContent" xml:space="preserve">
+    <value>开启</value>
+  </data>
+  <data name="PageRead.Header" xml:space="preserve">
+    <value>阅读</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>未知</value>
+  </data>
+  <data name="WrapMode.Header" xml:space="preserve">
+    <value>强制断行</value>
+  </data>
+  <data name="WrapMode.OffContent" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="WrapMode.OnContent" xml:space="preserve">
+    <value>开启</value>
   </data>
 </root>

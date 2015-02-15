@@ -41,14 +41,16 @@ namespace ChmBrowser
         public ReadingPage()
         {
             this.InitializeComponent();
-            root.Children.Remove(settingRoot);
+            HideSetting();
             this.NavigationCacheMode = NavigationCacheMode.Required;
             this.Loaded += ReadingPage_Loaded;
             _lastWebViewUrl = null;
             webView.NavigationCompleted += webView_NavigationCompleted;
             webView.NavigationStarting += webView_NavigationStarting;
             scaleSlider.ValueChanged += scaleSlider_ValueChanged;
-            isAutoZoom.Toggled += isAutoZoom_Toggled;            
+            isAutoZoom.Toggled += isAutoZoom_Toggled;
+            isNightMode.Toggled += isNightMode_Toggled;
+            isWrapMode.Toggled += isWrapMode_Toggled;
         }
 
         void ReadingPage_Loaded(object sender, RoutedEventArgs e)
@@ -122,7 +124,7 @@ namespace ChmBrowser
             {
                 commandBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
                 progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                root.Children.Remove(settingRoot);
+                HideSetting();
                 await _chmFile.Save();
             }
             else
@@ -176,7 +178,7 @@ namespace ChmBrowser
             scaleSlider.ValueChanged -= scaleSlider_ValueChanged;
             isAutoZoom.Toggled -= isAutoZoom_Toggled;
             ResetSetting();
-            _uriResolver = new ChmStreamUriTResolver(_chmFile, zoomIndicator.Text);
+            _uriResolver = new ChmStreamUriTResolver(_chmFile, zoomIndicator.Text, isWrapMode.IsOn, isNightMode.IsOn);
             scaleSlider.ValueChanged += scaleSlider_ValueChanged;
             isAutoZoom.Toggled += isAutoZoom_Toggled;
             
@@ -184,7 +186,7 @@ namespace ChmBrowser
 
             commandBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
             progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            root.Children.Remove(settingRoot);
+            HideSetting();
 
             int mask = _chmFile.HasOutline ? 1 : 2;
             foreach (var x in commandBar.PrimaryCommands.Concat(commandBar.SecondaryCommands))
@@ -211,7 +213,10 @@ namespace ChmBrowser
                 webView.Stop();
                 NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Disabled;
             }
-            
+            if (_chmFile != null)
+            {
+                await _chmFile.Save();
+            }
             await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().ShowAsync();
             base.OnNavigatedFrom(e);
         }
@@ -270,9 +275,20 @@ namespace ChmBrowser
         
         private void GoSetting_Click(object sender, RoutedEventArgs e)
         {
-            root.Children.Add(settingRoot);
+            ShowSetting();
             commandBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;     
             progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+        }
+        private void ShowSetting()
+        {
+            //settingRoot.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            root.Children.Add(settingRoot);
+            settingRoot.UpdateLayout();
+        }
+        private void HideSetting()
+        {
+            //settingRoot.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            root.Children.Remove(settingRoot);
         }
         private async Task SetScale(string value)
         {
@@ -283,7 +299,31 @@ namespace ChmBrowser
                     value = "auto";
                 }
                 _uriResolver.SetScale(value);
-                await webView.InvokeScriptAsync("setScale", new string[]{value});
+                await webView.InvokeScriptAsync(ChmStreamUriTResolver.SetScaleFuncName, new string[]{value});
+            }
+            catch
+            {
+                // ignore error
+            }
+        }
+        private async Task SetNightMode(bool on)
+        {
+            try
+            {
+                _uriResolver.SetIsNight(on);
+                await webView.InvokeScriptAsync(ChmStreamUriTResolver.SetNightModeFuncName, new string[] { on?"on":"off"});
+            }
+            catch
+            {
+                // ignore error
+            }
+        }
+        private async Task SetWrapMode(bool on)
+        {
+            try
+            {
+                _uriResolver.SetIsWrap(on);
+                await webView.InvokeScriptAsync(ChmStreamUriTResolver.SetWrapFuncName, new string[] { on ? "on" : "off" });
             }
             catch
             {
@@ -334,6 +374,8 @@ namespace ChmBrowser
                 scaleSlider.Value = v;
             }
             zoomIndicator.Text = scale;
+            isNightMode.IsOn = _chmFile.ChmMeta.GetIsNightMode();
+            isWrapMode.IsOn = _chmFile.ChmMeta.GetIsWrapMode();
         }
         private async void isAutoZoom_Toggled(object sender, RoutedEventArgs e)
         {
@@ -352,6 +394,22 @@ namespace ChmBrowser
             await SetScale(zoomIndicator.Text);
             await _chmFile.Save();
         }
+
+
+        async void isWrapMode_Toggled(object sender, RoutedEventArgs e)
+        {
+            await SetWrapMode(isWrapMode.IsOn);
+            _chmFile.ChmMeta.SetIsWrapMode(isWrapMode.IsOn);
+            await _chmFile.Save();
+        }
+
+        async void isNightMode_Toggled(object sender, RoutedEventArgs e)
+        {
+            await SetNightMode(isNightMode.IsOn);
+            _chmFile.ChmMeta.SetIsNightMode(isNightMode.IsOn);
+            await _chmFile.Save();
+        }
+
 
         private async void scaleSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
@@ -375,13 +433,35 @@ namespace ChmBrowser
     /// </summary>
     public sealed class ChmStreamUriTResolver : IUriToStreamResolver
     {
+        public const string SetScaleFuncName = "DE3A90B588894290AEDD485D8FE1E6AD_setScale";
+        public const string SetWrapFuncName = "DE3A90B588894290AEDD485D8FE1E6AD_setWrap";
+        public const string SetNightModeFuncName = "DE3A90B588894290AEDD485D8FE1E6AD_setNightMode";
+
+        private const string WrapCss = "*{word-wrap:break-word !important;} pre {white-space:pre-wrap !important;}";
+        private const string NightModeCss = "* {background-color:black !important;color:white !important;} a {text-decoration: underline !important;}";
+
         private volatile string _scale;
+        private volatile bool _isWrapMode;
+        private volatile bool _isNightMode;
+
         private WeakReference<ChmFile> _chmFile;
 
-        public ChmStreamUriTResolver(ChmFile chmFile, string scale = "auto")
+        public ChmStreamUriTResolver(ChmFile chmFile, string scale = "auto", bool isWrap = false, bool isNight = false)
         {
             _chmFile = new WeakReference<ChmFile>(chmFile);
             _scale = scale;
+            _isWrapMode = isWrap;
+            _isNightMode = isNight;
+        }
+
+        public void SetIsWrap(bool isWrap)
+        {
+            _isWrapMode = isWrap;
+        }
+
+        public void SetIsNight(bool isNight)
+        {
+            _isNightMode = isNight;
         }
 
         public void SetScale(string scale)
@@ -391,12 +471,32 @@ namespace ChmBrowser
 
         private byte[] GetInjectedContent()
         {
-            // *{word-wrap:break-word;} pre {white-space:pre-wrap;}
+            string injectedWrapCss = string.Empty;
+            if (_isWrapMode)
+            {
+                injectedWrapCss = WrapCss;
+            }
+            string injectedNightModeCss = string.Empty;
+            if (_isNightMode)
+            {
+                injectedNightModeCss = NightModeCss;
+            }
             return Encoding.UTF8.GetBytes
-            ("<style type='text/css'>*{-ms-text-size-adjust:"+ _scale + ";}</style>" +
-            "<script type='text/javascript'>function setScale(scale){document.styleSheets[document.styleSheets.length - 1].rules[0].style.cssText='-ms-text-size-adjust:'+scale +';';" + 
-            "var i,frames;frames=document.getElementsByTagName('iframe');for(i=0;i<frames.length; ++i){if(frames[i].contentWindow&&frames[i].contentWindow.setScale){frames[i].contentWindow.setScale(scale);}}" + 
-            "}</script>"
+            (
+            "<style type='text/css'>" + injectedNightModeCss + "</style>" +  // styleSheets for night mode.
+            "<style type='text/css'>" + injectedWrapCss + "</style>" +  // styleSheets for word wrapping.
+            "<style type='text/css'>*{-ms-text-size-adjust:"+ _scale + ";}</style>" +
+            "<script type='text/javascript'>" +
+            "function DE3A90B588894290AEDD485D8FE1E6AD_setScale(scale){document.styleSheets[document.styleSheets.length - 1].rules[0].style.cssText='-ms-text-size-adjust:'+scale +';';" +
+            "var i,frames;frames=document.getElementsByTagName('iframe');for(i=0;i<frames.length; ++i){if(frames[i].contentWindow&&frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setScale){frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setScale(scale);}}" + 
+            "}" +
+            "function DE3A90B588894290AEDD485D8FE1E6AD_setWrap(flag){var wrapsheet=document.styleSheets[document.styleSheets.length - 2]; if (flag != 'on') wrapsheet.cssText=''; else wrapsheet.cssText='"+ WrapCss + "';"  +
+            "var i,frames;frames=document.getElementsByTagName('iframe');for(i=0;i<frames.length; ++i){if(frames[i].contentWindow&&frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setWrap){frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setWrap(flag);}}" + 
+            "}" +
+            "function DE3A90B588894290AEDD485D8FE1E6AD_setNightMode(flag){var nightsheet=document.styleSheets[document.styleSheets.length - 3]; if (flag != 'on') nightsheet.cssText=''; else nightsheet.cssText='" + NightModeCss + "';" +
+            "var i,frames;frames=document.getElementsByTagName('iframe');for(i=0;i<frames.length; ++i){if(frames[i].contentWindow&&frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setNightMode){frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setNightMode(flag);}}" +
+            "}" +
+            "</script>"
             );
         }
 

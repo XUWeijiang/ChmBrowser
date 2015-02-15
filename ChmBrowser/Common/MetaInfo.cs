@@ -61,6 +61,16 @@ namespace ChmBrowser.Common
             SetMeta("scale", scale);
         }
 
+        public void SetIsNightMode(bool nightMode)
+        {
+            SetMeta("nightmode", nightMode?"Yes":"");
+        }
+
+        public void SetIsWrapMode(bool wrapMode)
+        {
+            SetMeta("wrapmode", wrapMode?"Yes":"");
+        }
+
         public string GetLast()
         {
             return GetMeta("last");
@@ -87,6 +97,16 @@ namespace ChmBrowser.Common
             return scale;
         }
 
+        public bool GetIsNightMode()
+        {
+            return !string.IsNullOrEmpty(GetMeta("nightmode"));
+        }
+
+        public bool GetIsWrapMode()
+        {
+            return !string.IsNullOrEmpty(GetMeta("wrapmode"));
+        }
+
         public async Task SaveMetaInfo(IStorageFile file)
         {
             await FileIO.WriteLinesAsync(file, _meta.Select(x => x.Key + "=" + x.Value));
@@ -110,8 +130,13 @@ namespace ChmBrowser.Common
                     info._meta[kv[0]] = kv[1];
                 }
             }
-            catch
-            { }
+            catch (Exception ex)
+            {
+                if (System.Diagnostics.Debugger.IsAttached)
+                {
+                    System.Diagnostics.Debug.WriteLine(string.Format("Load Meta fails: {0} : {1}", file.Name, ex.Message));
+                }
+            }
             return info;
         }
         public static async Task<MetaInfo> ReadMetaInfo(string key)
@@ -122,8 +147,13 @@ namespace ChmBrowser.Common
                 var file = await localFolder.GetFileAsync(key + ChmMetaFileExtension);
                 return await ReadMetaInfo(file);
             }
-            catch
-            { }
+            catch (Exception ex)
+            {
+                if (System.Diagnostics.Debugger.IsAttached)
+                {
+                    System.Diagnostics.Debug.WriteLine(string.Format("Load Meta fails: {0} : {1}", key, ex.Message));
+                }
+            }
             return new MetaInfo();;
         }
         public static async Task<bool> DeleteMetaFile(string key)

@@ -190,9 +190,9 @@
     <value>opening file...</value>
   </data>
   <data name="OpenSource.Text" xml:space="preserve">
-    <value>Based on the rule of open source, I will share my source code on Github when ready.</value>
+    <value>Based on the rule of open source, I have shared my source code on Github (search 'ChmBrowser').</value>
   </data>
-  <data name="PageZoom.Text" xml:space="preserve">
+  <data name="PageZoom.Header" xml:space="preserve">
     <value>zoom</value>
   </data>
   <data name="Phone.Text" xml:space="preserve">
@@ -224,5 +224,29 @@
   </data>
   <data name="Home.Label" xml:space="preserve">
     <value>home</value>
+  </data>
+  <data name="NightMode.Header" xml:space="preserve">
+    <value>night mode</value>
+  </data>
+  <data name="NightMode.OffContent" xml:space="preserve">
+    <value>off</value>
+  </data>
+  <data name="NightMode.OnContent" xml:space="preserve">
+    <value>on</value>
+  </data>
+  <data name="PageRead.Header" xml:space="preserve">
+    <value>read</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="WrapMode.Header" xml:space="preserve">
+    <value>force text to wrap</value>
+  </data>
+  <data name="WrapMode.OffContent" xml:space="preserve">
+    <value>off</value>
+  </data>
+  <data name="WrapMode.OnContent" xml:space="preserve">
+    <value>on</value>
   </data>
 </root>
