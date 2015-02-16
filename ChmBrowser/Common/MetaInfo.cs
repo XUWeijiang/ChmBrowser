@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
+using System.Threading;
 
 namespace ChmBrowser.Common
 {
@@ -13,6 +14,7 @@ namespace ChmBrowser.Common
     {
         public const string ChmMetaFileExtension = ".meta";
         private IDictionary<string, string> _meta = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private static SemaphoreSlim s_semaphore = new SemaphoreSlim(1); // TODO: key level lock.
 
         public MetaInfo()
         { }
@@ -109,7 +111,15 @@ namespace ChmBrowser.Common
 
         public async Task SaveMetaInfo(IStorageFile file)
         {
-            await FileIO.WriteLinesAsync(file, _meta.Select(x => x.Key + "=" + x.Value));
+            await s_semaphore.WaitAsync();
+            try
+            {
+                await FileIO.WriteLinesAsync(file, _meta.Select(x => x.Key + "=" + x.Value));
+            }
+            finally
+            {
+                s_semaphore.Release();
+            }
         }
         public async Task SaveMetaInfo(string key)
         {
@@ -120,6 +130,7 @@ namespace ChmBrowser.Common
         public static async Task<MetaInfo> ReadMetaInfo(IStorageFile file)
         {
             MetaInfo info = new MetaInfo();
+            await s_semaphore.WaitAsync();
             try
             {
                 IList<string> data = await FileIO.ReadLinesAsync(file);
@@ -136,6 +147,10 @@ namespace ChmBrowser.Common
                 {
                     System.Diagnostics.Debug.WriteLine(string.Format("Load Meta fails: {0} : {1}", file.Name, ex.Message));
                 }
+            }
+            finally
+            {
+                s_semaphore.Release();
             }
             return info;
         }
@@ -154,7 +169,7 @@ namespace ChmBrowser.Common
                     System.Diagnostics.Debug.WriteLine(string.Format("Load Meta fails: {0} : {1}", key, ex.Message));
                 }
             }
-            return new MetaInfo();;
+            return new MetaInfo();
         }
         public static async Task<bool> DeleteMetaFile(string key)
         {
