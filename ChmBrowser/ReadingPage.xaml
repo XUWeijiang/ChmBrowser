@@ -14,6 +14,9 @@
                 <TextBlock Text="{Binding}" Margin="0, 0, 0, 0" Style="{ThemeResource SubheaderTextBlockStyle}" />
             </ContentPresenter>
         </DataTemplate>
+        <Storyboard x:Name="webViewBack">
+            <DoubleAnimation Storyboard.TargetName="webViewTranslate" Storyboard.TargetProperty="X" Duration="0:0:0.15" To="0" />
+        </Storyboard>
     </Page.Resources>
     <Grid x:Name="root">
         <Grid.RowDefinitions>
@@ -22,7 +25,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <ProgressBar x:Name="progressBar" Grid.Row="0" IsIndeterminate="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed"/>
-        <WebView Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="webView"/>
+        <WebView Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="webView">
+            <WebView.RenderTransform>
+                <TranslateTransform x:Name="webViewTranslate"/>
+            </WebView.RenderTransform>
+        </WebView>
         <Pivot x:Name="settingRoot" Grid.Row="2" Margin="0,-20,0,0">
             <PivotItem x:Uid="PageZoom" Header="缩放">
                 <Grid Margin="0, 0, 0, 25">
@@ -54,6 +61,19 @@
                     </Grid.RowDefinitions>
                     <ToggleSwitch x:Uid="WrapMode" x:Name="isWrapMode" Grid.Row="0" Header="强制换行" OnContent="开启" OffContent="关闭"/>
                     <ToggleSwitch x:Uid="NightMode" x:Name="isNightMode" Grid.Row="1" Header="夜间模式" OnContent="开启" OffContent="关闭"/>
+                </Grid>
+            </PivotItem>
+            <PivotItem x:Uid="PageControl" x:Name="pageControl" Header="控制">
+                <Grid Margin="0, 0, 0, 10">
+                    <Grid.ChildrenTransitions>
+                        <TransitionCollection>
+                            <EntranceThemeTransition/>
+                        </TransitionCollection>
+                    </Grid.ChildrenTransitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ToggleSwitch x:Uid="SwipeMode" x:Name="isSwipeMode" Grid.Row="0" Header="滑动翻页" OnContent="开启(无法水平滚动)" OffContent="关闭"/>
                 </Grid>
             </PivotItem>
         </Pivot>

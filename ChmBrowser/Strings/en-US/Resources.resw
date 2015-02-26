@@ -249,4 +249,16 @@
   <data name="WrapMode.OnContent" xml:space="preserve">
     <value>on</value>
   </data>
+  <data name="SwipeMode.Header" xml:space="preserve">
+    <value>swipe to navigate</value>
+  </data>
+  <data name="SwipeMode.OffContent" xml:space="preserve">
+    <value>off</value>
+  </data>
+  <data name="SwipeMode.OnContent" xml:space="preserve">
+    <value>on(no horizon scroll)</value>
+  </data>
+  <data name="PageControl.Header" xml:space="preserve">
+    <value>control</value>
+  </data>
 </root>

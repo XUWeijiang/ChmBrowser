@@ -74,9 +74,10 @@ namespace ChmBrowser
             {
                 return;
             }
+            double realVertialOffset = (double)(_topics.SelectedIndex + 1) / (double)_topics.Topics.Count * childrenSV.ExtentHeight;
             double expectedVerticalOffset = (double)(_topics.SelectedIndex > 0? _topics.SelectedIndex - 1: 0) / (double)_topics.Topics.Count * childrenSV.ExtentHeight;
             double currentVerticalOffset = childrenSV.VerticalOffset;
-            if (expectedVerticalOffset > currentVerticalOffset && expectedVerticalOffset < currentVerticalOffset + childrenSV.ViewportHeight)
+            if (realVertialOffset > currentVerticalOffset && realVertialOffset < currentVerticalOffset + childrenSV.ViewportHeight)
             {
                 childrenSV.ChangeView(0, null, null);
             }

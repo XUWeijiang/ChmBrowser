@@ -21,6 +21,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using Windows.Web;
 
@@ -38,6 +39,12 @@ namespace ChmBrowser
         private ChmStreamUriTResolver _uriResolver;
         private ChmFile _chmFile;
 
+        private int _pressDownX;
+        private DateTime _pressDownTime;
+        private double _swipeThreshouldRatio = 0.5;
+        private double _swipeThreshouldInPixel = 40;
+        private double _swipeThreshouldInMS = 300;
+
         public ReadingPage()
         {
             this.InitializeComponent();
@@ -45,12 +52,31 @@ namespace ChmBrowser
             this.NavigationCacheMode = NavigationCacheMode.Required;
             this.Loaded += ReadingPage_Loaded;
             _lastWebViewUrl = null;
+            
             webView.NavigationCompleted += webView_NavigationCompleted;
             webView.NavigationStarting += webView_NavigationStarting;
+            webView.ScriptNotify += webView_ScriptNotify;
+            webView.ContentLoading += webView_ContentLoading;
+
+            AttachEventToSetting();
+        }
+
+        private void AttachEventToSetting()
+        {
             scaleSlider.ValueChanged += scaleSlider_ValueChanged;
             isAutoZoom.Toggled += isAutoZoom_Toggled;
             isNightMode.Toggled += isNightMode_Toggled;
             isWrapMode.Toggled += isWrapMode_Toggled;
+            isSwipeMode.Toggled += isSwipeMode_Toggled;
+        }
+
+        private void DetachEventFromSetting()
+        {
+            scaleSlider.ValueChanged -= scaleSlider_ValueChanged;
+            isAutoZoom.Toggled -= isAutoZoom_Toggled;
+            isNightMode.Toggled -= isNightMode_Toggled;
+            isWrapMode.Toggled -= isWrapMode_Toggled;
+            isSwipeMode.Toggled -= isSwipeMode_Toggled;
         }
 
         void ReadingPage_Loaded(object sender, RoutedEventArgs e)
@@ -92,6 +118,11 @@ namespace ChmBrowser
                 progressBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
             }
         }
+        void webView_ContentLoading(WebView sender, WebViewContentLoadingEventArgs args)
+        {
+            webViewTranslate.X = 0;
+        }
+
         async void webView_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
         {
             progressBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
@@ -115,6 +146,87 @@ namespace ChmBrowser
                 //    }
                 //}
             }
+        }
+        
+        async void webView_ScriptNotify(object sender, NotifyEventArgs e)
+        {
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                //System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("mm:ss:fff") + ":" + e.Value);
+            }
+
+            string[] data = e.Value.Split(':');
+            int x = Convert.ToInt32(data[1]);
+            if (Windows.Graphics.Display.DisplayInformation.GetForCurrentView().CurrentOrientation == Windows.Graphics.Display.DisplayOrientations.Landscape
+                || Windows.Graphics.Display.DisplayInformation.GetForCurrentView().CurrentOrientation == Windows.Graphics.Display.DisplayOrientations.LandscapeFlipped)
+            {
+                x = Convert.ToInt32(data[2]);
+            }
+            char type = data[0][0];
+            switch (type)
+            {
+                case 'd':
+                    {
+                        _pressDownX = x;
+                        _pressDownTime = DateTime.Now;
+                        break;
+                    }
+                case 'u':
+                    {
+                        double diffInMS = (DateTime.Now - _pressDownTime).TotalMilliseconds;
+                        if ((x - _pressDownX >= _swipeThreshouldRatio * webView.ActualWidth 
+                            || (x - _pressDownX >= _swipeThreshouldInPixel && diffInMS < _swipeThreshouldInMS))
+                            && await _chmFile.CanGoPrevious())
+                        {
+                            CreateRightLeaveStoryboard().Begin();
+                        }
+                        else if ((_pressDownX - x >= _swipeThreshouldRatio * webView.ActualWidth
+                            || (_pressDownX - x >= _swipeThreshouldInPixel && diffInMS < _swipeThreshouldInMS))
+                            && await _chmFile.CanGoNext())
+                        {
+                            CreateLeftLeaveStoryboard().Begin();
+                        }
+                        else
+                        {
+                            webViewBack.Begin();
+                        }
+                        break; 
+                    }
+                case 'm':
+                    {
+                        webViewTranslate.X = x - _pressDownX;
+                        break;
+                    }
+                default:
+                    {
+                        break;
+                    }
+            }
+        }
+        private Storyboard CreateRightLeaveStoryboard()
+        {
+            Storyboard s = new Storyboard();
+            DoubleAnimation da = new DoubleAnimation();
+            Storyboard.SetTarget(da, webViewTranslate);
+            Storyboard.SetTargetProperty(da, "X");
+            da.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 100));
+            da.To = webView.ActualWidth;
+            s.Children.Add(da);
+            s.Completed += (a, e) => Previous_Click(null, null);
+            return s;            
+        }
+
+        private Storyboard CreateLeftLeaveStoryboard()
+        {
+            Storyboard s = new Storyboard();
+            DoubleAnimation da = new DoubleAnimation();
+            Storyboard.SetTarget(da, webViewTranslate);
+            Storyboard.SetTargetProperty(da, "X");
+            da.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 100));
+            da.To = -webView.ActualWidth;
+            s.Children.Add(da);
+            s.Completed += (a, e) => Next_Click(null, null);
+            return s;
         }
 
         async void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
@@ -175,12 +287,10 @@ namespace ChmBrowser
             HardwareButtons.BackPressed += HardwareButtons_BackPressed;
             Application.Current.Suspending += Current_Suspending;
 
-            scaleSlider.ValueChanged -= scaleSlider_ValueChanged;
-            isAutoZoom.Toggled -= isAutoZoom_Toggled;
+            DetachEventFromSetting();
             ResetSetting();
-            _uriResolver = new ChmStreamUriTResolver(_chmFile, zoomIndicator.Text, isWrapMode.IsOn, isNightMode.IsOn);
-            scaleSlider.ValueChanged += scaleSlider_ValueChanged;
-            isAutoZoom.Toggled += isAutoZoom_Toggled;
+            _uriResolver = new ChmStreamUriTResolver(_chmFile, zoomIndicator.Text, isWrapMode.IsOn, isNightMode.IsOn, isSwipeMode.IsOn);
+            AttachEventToSetting();
             
             await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().HideAsync();
 
@@ -230,14 +340,14 @@ namespace ChmBrowser
         {
             if (await _chmFile.SetNext())
             {
-                await UpdateReading();
+                await UpdateReading(true);
             }
         }
         private async void Previous_Click(object sender, RoutedEventArgs e)
         {
             if (await _chmFile.SetPrevious())
             {
-                await UpdateReading();
+                await UpdateReading(true);
             }
         }
         private async Task UpdateReading(bool force = false)
@@ -330,6 +440,18 @@ namespace ChmBrowser
                 // ignore error
             }
         }
+        private async Task SetSwipeMode(bool on)
+        {
+            try
+            {
+                _uriResolver.SetIsSwipe(on);
+                await webView.InvokeScriptAsync(ChmStreamUriTResolver.SetSwipeModeFuncName, new string[] { on ? "on" : "off" });
+            }
+            catch
+            {
+                // ignore error
+            }
+        }
         private static string GetStandardScale(ChmFile chmFile, out double v)
         {
             string scale = chmFile.ChmMeta.GetScale();
@@ -376,6 +498,7 @@ namespace ChmBrowser
             zoomIndicator.Text = scale;
             isNightMode.IsOn = _chmFile.ChmMeta.GetIsNightMode();
             isWrapMode.IsOn = _chmFile.ChmMeta.GetIsWrapMode();
+            isSwipeMode.IsOn = _chmFile.ChmMeta.GetIsSwipeMode();
         }
         private async void isAutoZoom_Toggled(object sender, RoutedEventArgs e)
         {
@@ -409,7 +532,12 @@ namespace ChmBrowser
             _chmFile.ChmMeta.SetIsNightMode(isNightMode.IsOn);
             await _chmFile.Save();
         }
-
+        async void isSwipeMode_Toggled(object sender, RoutedEventArgs e)
+        {
+            await SetSwipeMode(isSwipeMode.IsOn);
+            _chmFile.ChmMeta.SetIsSWipeMode(isSwipeMode.IsOn);
+            await _chmFile.Save();
+        }
 
         private async void scaleSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
@@ -436,22 +564,30 @@ namespace ChmBrowser
         public const string SetScaleFuncName = "DE3A90B588894290AEDD485D8FE1E6AD_setScale";
         public const string SetWrapFuncName = "DE3A90B588894290AEDD485D8FE1E6AD_setWrap";
         public const string SetNightModeFuncName = "DE3A90B588894290AEDD485D8FE1E6AD_setNightMode";
+        public const string SetSwipeModeFuncName = "DE3A90B588894290AEDD485D8FE1E6AD_setSwipeMode";
 
+        private const string SwipeModeCss = " html {touch-action:pan-y pinch-zoom double-tap-zoom;}";
         private const string WrapCss = "*{word-wrap:break-word !important;} pre {white-space:pre-wrap !important;}";
         private const string NightModeCss = "* {background-color:black !important;color:white !important;} a {text-decoration: underline !important;}";
+        private const string NotifyScript = 
+            "window.addEventListener('MSPointerDown',function(event){window.external.notify('d:'+event.screenX+':'+event.screenY);});" +
+            "window.addEventListener('MSPointerUp',function(event){window.external.notify('u:'+event.screenX+':'+event.screenY);});" +
+            "window.addEventListener('MSPointerMove',function(event){window.external.notify('m:'+event.screenX+':'+event.screenY);});";
 
         private volatile string _scale;
         private volatile bool _isWrapMode;
         private volatile bool _isNightMode;
+        private volatile bool _isSwipeMode;
 
         private WeakReference<ChmFile> _chmFile;
 
-        public ChmStreamUriTResolver(ChmFile chmFile, string scale = "auto", bool isWrap = false, bool isNight = false)
+        public ChmStreamUriTResolver(ChmFile chmFile, string scale, bool isWrap, bool isNight, bool isSwipe)
         {
             _chmFile = new WeakReference<ChmFile>(chmFile);
             _scale = scale;
             _isWrapMode = isWrap;
             _isNightMode = isNight;
+            _isSwipeMode = isSwipe;
         }
 
         public void SetIsWrap(bool isWrap)
@@ -462,6 +598,11 @@ namespace ChmBrowser
         public void SetIsNight(bool isNight)
         {
             _isNightMode = isNight;
+        }
+
+        public void SetIsSwipe(bool isSwipe)
+        {
+            _isSwipeMode = isSwipe;
         }
 
         public void SetScale(string scale)
@@ -481,8 +622,14 @@ namespace ChmBrowser
             {
                 injectedNightModeCss = NightModeCss;
             }
+            string injectedSwipeModeCss = string.Empty;
+            if (_isSwipeMode)
+            {
+                injectedSwipeModeCss = SwipeModeCss;
+            }
             return Encoding.UTF8.GetBytes
             (
+            "<style type='text/css'>" + injectedSwipeModeCss + "</style>" +  // styleSheets for swipe mode.
             "<style type='text/css'>" + injectedNightModeCss + "</style>" +  // styleSheets for night mode.
             "<style type='text/css'>" + injectedWrapCss + "</style>" +  // styleSheets for word wrapping.
             "<style type='text/css'>*{-ms-text-size-adjust:"+ _scale + ";}</style>" +
@@ -496,6 +643,10 @@ namespace ChmBrowser
             "function DE3A90B588894290AEDD485D8FE1E6AD_setNightMode(flag){var nightsheet=document.styleSheets[document.styleSheets.length - 3]; if (flag != 'on') nightsheet.cssText=''; else nightsheet.cssText='" + NightModeCss + "';" +
             "var i,frames;frames=document.getElementsByTagName('iframe');for(i=0;i<frames.length; ++i){if(frames[i].contentWindow&&frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setNightMode){frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setNightMode(flag);}}" +
             "}" +
+            "function DE3A90B588894290AEDD485D8FE1E6AD_setSwipeMode(flag){var swipesheet=document.styleSheets[document.styleSheets.length - 4]; if (flag != 'on') swipesheet.cssText=''; else swipesheet.cssText='" + SwipeModeCss + "';" +
+            "var i,frames;frames=document.getElementsByTagName('iframe');for(i=0;i<frames.length; ++i){if(frames[i].contentWindow&&frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setSwipeMode){frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setSwipeMode(flag);}}" +
+            "}" +
+            NotifyScript + 
             "</script>"
             );
         }

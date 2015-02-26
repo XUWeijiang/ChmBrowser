@@ -121,7 +121,7 @@
  * defines related to tuning
  */
 #ifndef CHM_MAX_BLOCKS_CACHED
-#define CHM_MAX_BLOCKS_CACHED 5
+#define CHM_MAX_BLOCKS_CACHED 10
 #endif
 
 /*

@@ -167,6 +167,7 @@ namespace ChmBrowser.Common
                 {
                     SelectedTopic = t;
                     _selectedIndex = i;
+                    break;
                 }
             }
         }

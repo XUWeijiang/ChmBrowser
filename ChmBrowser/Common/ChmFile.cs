@@ -237,56 +237,102 @@ namespace ChmBrowser.Common
             _isSaving = false;
         }
 
+        public async Task<bool> CanGoNext()
+        {
+            return await GetNextIndex() >= 0;
+        }
+
+        public async Task<bool> CanGoPrevious()
+        {
+            return await GetPreviousIndex() >= 0;
+        }
+
         public async Task<bool> SetNext()
         {
-            if (HasOutline && Current + 1< Chm.Contents.Count)
+            int nextIndex = await GetNextIndex();
+            if (nextIndex >= 0)
             {
-                int i = 1;
-                while (Current + i < Chm.Contents.Count)
-                {
-                    if (await SetCurrent(Current + i))
-                    {
-                        return true;
-                    }
-                    i++;
-                }
+                SetCurrentInternal(nextIndex);
+                return true;
             }
             return false;
         }
 
         public async Task<bool> SetPrevious()
         {
-            if (HasOutline && Current > 0)
+            int prevIndex = await GetPreviousIndex();
+            if (prevIndex >= 0)
             {
-                int i = 1;
-                while (Current - i >= 0)
-                {
-                    if (await SetCurrent(Current - i))
-                    {
-                        return true;
-                    }
-                    i++;
-                }
+                SetCurrentInternal(prevIndex);
+                return true;
             }
             return false;
         }
 
-        public async Task<bool> SetCurrent(int index)
-        { 
+        private async Task<bool> IsValidIndex(int index)
+        {
             if (index >= Chm.Contents.Count || index < 0
-                || string.IsNullOrWhiteSpace(Chm.Contents[index].Url)) 
-            { 
-                return false; 
-            }
-            string url = Chm.Contents[index].Url;
-            if (!await HasData(url))
+                || string.IsNullOrWhiteSpace(Chm.Contents[index].Url))
             {
                 return false;
             }
-
+            if (!await HasData(Chm.Contents[index].Url))
+            {
+                return false;
+            }
+            return true;
+        }
+        private void SetCurrentInternal(int index)
+        {
+            string url = Chm.Contents[index].Url;
             Current = index;
             CurrentPath = url;
             ChmMeta.SetLast(CurrentPath);
+        }
+        private async Task<int> GetNextIndex()
+        {
+            if (HasOutline && Current + 1 < Chm.Contents.Count)
+            {
+                string url = Chm.Contents[Current].Url;
+                int i = 1;
+                while (Current + i < Chm.Contents.Count)
+                {
+                    if (string.Compare(url, Chm.Contents[Current + i].Url, StringComparison.OrdinalIgnoreCase) != 0
+                        && await IsValidIndex(Current + i))
+                    {
+                        return Current + i;
+                    }
+                    i++;
+                }
+            }
+            return -1;
+        }
+        private async Task<int> GetPreviousIndex()
+        {
+            if (HasOutline && Current > 0)
+            {
+                string url = Chm.Contents[Current].Url;
+                int i = 1;
+                while (Current - i >= 0)
+                {
+                    if (string.Compare(url, Chm.Contents[Current - i].Url, StringComparison.OrdinalIgnoreCase) != 0
+                        && await IsValidIndex(Current - i))
+                    {
+                        return Current - i;
+                    }
+                    i++;
+                }
+            }
+            return -1;
+        }
+
+        public async Task<bool> SetCurrent(int index)
+        { 
+            if (!await IsValidIndex(index))
+            {
+                return false;
+            }
+            SetCurrentInternal(index);
             return true;
         }
 
@@ -312,8 +358,7 @@ namespace ChmBrowser.Common
             {
                 if (string.Compare(url, Chm.Contents[i].Url, StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    await SetCurrent(i);
-                    return true;
+                    return await SetCurrent(i);
                 }
             }
             return false;

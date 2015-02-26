@@ -249,4 +249,16 @@
   <data name="WrapMode.OnContent" xml:space="preserve">
     <value>开启</value>
   </data>
+  <data name="PageControl.Header" xml:space="preserve">
+    <value>控制</value>
+  </data>
+  <data name="SwipeMode.Header" xml:space="preserve">
+    <value>滑动翻页</value>
+  </data>
+  <data name="SwipeMode.OffContent" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="SwipeMode.OnContent" xml:space="preserve">
+    <value>开启(无法水平滚动)</value>
+  </data>
 </root>

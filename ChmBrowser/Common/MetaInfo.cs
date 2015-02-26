@@ -73,6 +73,11 @@ namespace ChmBrowser.Common
             SetMeta("wrapmode", wrapMode?"Yes":"");
         }
 
+        public void SetIsSWipeMode(bool swipeMode)
+        {
+            SetMeta("swipemode", swipeMode ? "Yes" : "");
+        }
+
         public string GetLast()
         {
             return GetMeta("last");
@@ -102,6 +107,11 @@ namespace ChmBrowser.Common
         public bool GetIsNightMode()
         {
             return !string.IsNullOrEmpty(GetMeta("nightmode"));
+        }
+
+        public bool GetIsSwipeMode()
+        {
+            return !string.IsNullOrEmpty(GetMeta("swipemode"));
         }
 
         public bool GetIsWrapMode()
