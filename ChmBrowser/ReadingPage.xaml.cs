@@ -420,7 +420,7 @@ namespace ChmBrowser
         {
             try
             {
-                _uriResolver.SetIsNight(on);
+                _uriResolver.SetIsNightMode(on);
                 await webView.InvokeScriptAsync(ChmStreamUriTResolver.SetNightModeFuncName, new string[] { on?"on":"off"});
             }
             catch
@@ -432,8 +432,8 @@ namespace ChmBrowser
         {
             try
             {
-                _uriResolver.SetIsWrap(on);
-                await webView.InvokeScriptAsync(ChmStreamUriTResolver.SetWrapFuncName, new string[] { on ? "on" : "off" });
+                _uriResolver.SetIsWrapMode(on);
+                await webView.InvokeScriptAsync(ChmStreamUriTResolver.SetWrapModeFuncName, new string[] { on ? "on" : "off" });
             }
             catch
             {
@@ -444,7 +444,7 @@ namespace ChmBrowser
         {
             try
             {
-                _uriResolver.SetIsSwipe(on);
+                _uriResolver.SetIsSwipeMode(on);
                 await webView.InvokeScriptAsync(ChmStreamUriTResolver.SetSwipeModeFuncName, new string[] { on ? "on" : "off" });
             }
             catch
@@ -562,12 +562,12 @@ namespace ChmBrowser
     public sealed class ChmStreamUriTResolver : IUriToStreamResolver
     {
         public const string SetScaleFuncName = "DE3A90B588894290AEDD485D8FE1E6AD_setScale";
-        public const string SetWrapFuncName = "DE3A90B588894290AEDD485D8FE1E6AD_setWrap";
+        public const string SetWrapModeFuncName = "DE3A90B588894290AEDD485D8FE1E6AD_setWrapMode";
         public const string SetNightModeFuncName = "DE3A90B588894290AEDD485D8FE1E6AD_setNightMode";
         public const string SetSwipeModeFuncName = "DE3A90B588894290AEDD485D8FE1E6AD_setSwipeMode";
 
         private const string SwipeModeCss = " html {touch-action:pan-y pinch-zoom double-tap-zoom;}";
-        private const string WrapCss = "*{word-wrap:break-word !important;} pre {white-space:pre-wrap !important;}";
+        private const string WrapModeCss = "*{word-wrap:break-word !important;} pre {white-space:pre-wrap !important;}";
         private const string NightModeCss = "* {background-color:black !important;color:white !important;} a {text-decoration: underline !important;}";
         private const string NotifyScript = 
             "window.addEventListener('MSPointerDown',function(event){window.external.notify('d:'+event.screenX+':'+event.screenY);});" +
@@ -590,17 +590,17 @@ namespace ChmBrowser
             _isSwipeMode = isSwipe;
         }
 
-        public void SetIsWrap(bool isWrap)
+        public void SetIsWrapMode(bool isWrap)
         {
             _isWrapMode = isWrap;
         }
 
-        public void SetIsNight(bool isNight)
+        public void SetIsNightMode(bool isNight)
         {
             _isNightMode = isNight;
         }
 
-        public void SetIsSwipe(bool isSwipe)
+        public void SetIsSwipeMode(bool isSwipe)
         {
             _isSwipeMode = isSwipe;
         }
@@ -612,10 +612,10 @@ namespace ChmBrowser
 
         private byte[] GetInjectedContent()
         {
-            string injectedWrapCss = string.Empty;
+            string injectedWrapModeCss = string.Empty;
             if (_isWrapMode)
             {
-                injectedWrapCss = WrapCss;
+                injectedWrapModeCss = WrapModeCss;
             }
             string injectedNightModeCss = string.Empty;
             if (_isNightMode)
@@ -631,14 +631,14 @@ namespace ChmBrowser
             (
             "<style type='text/css'>" + injectedSwipeModeCss + "</style>" +  // styleSheets for swipe mode.
             "<style type='text/css'>" + injectedNightModeCss + "</style>" +  // styleSheets for night mode.
-            "<style type='text/css'>" + injectedWrapCss + "</style>" +  // styleSheets for word wrapping.
+            "<style type='text/css'>" + injectedWrapModeCss + "</style>" +  // styleSheets for word wrapping.
             "<style type='text/css'>*{-ms-text-size-adjust:"+ _scale + ";}</style>" +
             "<script type='text/javascript'>" +
             "function DE3A90B588894290AEDD485D8FE1E6AD_setScale(scale){document.styleSheets[document.styleSheets.length - 1].rules[0].style.cssText='-ms-text-size-adjust:'+scale +';';" +
             "var i,frames;frames=document.getElementsByTagName('iframe');for(i=0;i<frames.length; ++i){if(frames[i].contentWindow&&frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setScale){frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setScale(scale);}}" + 
             "}" +
-            "function DE3A90B588894290AEDD485D8FE1E6AD_setWrap(flag){var wrapsheet=document.styleSheets[document.styleSheets.length - 2]; if (flag != 'on') wrapsheet.cssText=''; else wrapsheet.cssText='"+ WrapCss + "';"  +
-            "var i,frames;frames=document.getElementsByTagName('iframe');for(i=0;i<frames.length; ++i){if(frames[i].contentWindow&&frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setWrap){frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setWrap(flag);}}" + 
+            "function DE3A90B588894290AEDD485D8FE1E6AD_setWrapMode(flag){var wrapsheet=document.styleSheets[document.styleSheets.length - 2]; if (flag != 'on') wrapsheet.cssText=''; else wrapsheet.cssText='"+ WrapModeCss + "';"  +
+            "var i,frames;frames=document.getElementsByTagName('iframe');for(i=0;i<frames.length; ++i){if(frames[i].contentWindow&&frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setWrapMode){frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setWrapMode(flag);}}" + 
             "}" +
             "function DE3A90B588894290AEDD485D8FE1E6AD_setNightMode(flag){var nightsheet=document.styleSheets[document.styleSheets.length - 3]; if (flag != 'on') nightsheet.cssText=''; else nightsheet.cssText='" + NightModeCss + "';" +
             "var i,frames;frames=document.getElementsByTagName('iframe');for(i=0;i<frames.length; ++i){if(frames[i].contentWindow&&frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setNightMode){frames[i].contentWindow.DE3A90B588894290AEDD485D8FE1E6AD_setNightMode(flag);}}" +
