@@ -150,6 +150,10 @@ namespace ChmBrowser
         
         async void webView_ScriptNotify(object sender, NotifyEventArgs e)
         {
+            if (!_chmFile.HasOutline)
+            {
+                return;
+            }
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 //System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("mm:ss:fff") + ":" + e.Value);
@@ -267,6 +271,7 @@ namespace ChmBrowser
         /// This parameter is typically used to configure the page.</param>
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
+            webViewTranslate.X = 0;
             SharedChmFile = null;
             if (e.Parameter == null)
             {
@@ -303,6 +308,20 @@ namespace ChmBrowser
             {
                 int tag = Convert.ToInt32((x as AppBarButton).Tag);
                 (x as AppBarButton).Visibility = ((tag & mask) != 0) ? Windows.UI.Xaml.Visibility.Visible : Windows.UI.Xaml.Visibility.Collapsed;
+            }
+            if (_chmFile.HasOutline)
+            {
+                if (!settingRoot.Items.Contains(pageControl))
+                {
+                    settingRoot.Items.Add(pageControl);
+                }
+            }
+            else
+            {
+                if (settingRoot.Items.Contains(pageControl))
+                {
+                    settingRoot.Items.Remove(pageControl);
+                }
             }
             await UpdateReading();
         }
@@ -342,12 +361,20 @@ namespace ChmBrowser
             {
                 await UpdateReading(true);
             }
+            else
+            {
+                webViewTranslate.X = 0;
+            }
         }
         private async void Previous_Click(object sender, RoutedEventArgs e)
         {
             if (await _chmFile.SetPrevious())
             {
                 await UpdateReading(true);
+            }
+            else
+            {
+                webViewTranslate.X = 0;
             }
         }
         private async Task UpdateReading(bool force = false)
@@ -360,6 +387,14 @@ namespace ChmBrowser
                     webView.NavigateToLocalStreamUri(url, _uriResolver);
                     await _chmFile.Save();
                 }
+                else
+                {
+                    webViewTranslate.X = 0;
+                }
+            }
+            else
+            {
+                webViewTranslate.X = 0;
             }
         }
         private void GoBack_Click(object sender, RoutedEventArgs e)

@@ -197,7 +197,7 @@
     <PackageInfo>
       <OsMinVersion>6.3.0.0</OsMinVersion>
       <PackageArchitecture>arm</PackageArchitecture>
-      <PackageMaxArchitectureVersion>2.1.1.0</PackageMaxArchitectureVersion>
+      <PackageMaxArchitectureVersion>2.2.0.0</PackageMaxArchitectureVersion>
     </PackageInfo>
   </PackageInfoList>
 </StoreAssociation>
