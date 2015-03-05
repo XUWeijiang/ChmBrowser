@@ -261,4 +261,7 @@
   <data name="SwipeMode.OnContent" xml:space="preserve">
     <value>开启(无法水平滚动)</value>
   </data>
+  <data name="Outline.Label" xml:space="preserve">
+    <value>大纲</value>
+  </data>
 </root>

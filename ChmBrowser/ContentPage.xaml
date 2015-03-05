@@ -21,9 +21,9 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
+        
         <!-- Title Panel -->
-        <StackPanel Grid.Row="0" Margin="19,0,0,0">
+        <StackPanel x:Name="titleRoot" Grid.Row="0" Margin="19,0,0,0">
             <TextBlock x:Uid="Title" Text="CHM阅读器" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0" x:Name="bookNameBlock" TextWrapping="WrapWholeWords"/>
             <TextBlock x:Uid="Contents" Text="目录" Margin="0,-6.5,0,10" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
         </StackPanel>
@@ -31,6 +31,27 @@
         <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,5,19,0">
             <ScrollViewer x:Name="childrenSV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <ItemsControl x:Name="itemsControl" ItemsSource="{Binding Topics}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsStackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.Template>
+                        <ControlTemplate>
+                            <ItemsPresenter/>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock FontSize="16" Margin="{Binding Margin}" Text="{Binding Topic}" Foreground="{Binding Fore}" FontWeight="{Binding FontWeight}" Tapped="tbTopic_Tapped"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+        <Grid Grid.Row="0" Grid.RowSpan="2" x:Name="OutlineRoot" Margin="19,5,19,0" Visibility="Collapsed">
+            <ScrollViewer x:Name="OutlinechildrenSV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                <ItemsControl x:Name="OutlineitemsControl" ItemsSource="{Binding OutlineTopics}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <ItemsStackPanel Orientation="Vertical"/>
@@ -51,12 +72,13 @@
         </Grid>
     </Grid>
     <Page.BottomAppBar>
-        <CommandBar ClosedDisplayMode="Minimal">
+        <CommandBar ClosedDisplayMode="Compact" x:Name="commandBar">
             <CommandBar.PrimaryCommands>
                 <AppBarButton x:Uid="Top" Label="顶部" Click="GoTop_Click"  Icon="Upload">
                 </AppBarButton>
                 <AppBarButton x:Uid="Bottom" Label="底部" Click="GoBottom_Click" Icon="Download">
                 </AppBarButton>
+                <AppBarButton x:Uid="Outline" x:Name="buttonOutline" Label="大纲" Click="Outline_Click" Icon="HideBcc"></AppBarButton>
             </CommandBar.PrimaryCommands>
         </CommandBar>
     </Page.BottomAppBar>

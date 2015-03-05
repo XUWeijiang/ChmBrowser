@@ -261,4 +261,7 @@
   <data name="PageControl.Header" xml:space="preserve">
     <value>control</value>
   </data>
+  <data name="Outline.Label" xml:space="preserve">
+    <value>outline</value>
+  </data>
 </root>

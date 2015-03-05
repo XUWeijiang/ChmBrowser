@@ -29,7 +29,7 @@ public:
         ChmTopic^ newTopic = ref new ChmTopic(
             ref new Platform::String(name), 
             ref new Platform::String(url), 
-            level);
+            level - 1); //start from 0 (instead of 1)
         contents_->Append(newTopic);
     }
 };
