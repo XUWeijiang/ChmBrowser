@@ -264,4 +264,7 @@
   <data name="Outline.Label" xml:space="preserve">
     <value>大纲</value>
   </data>
+  <data name="GoSearch.Label" xml:space="preserve">
+    <value>搜索...</value>
+  </data>
 </root>

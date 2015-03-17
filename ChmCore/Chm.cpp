@@ -6,6 +6,7 @@
 
 using namespace ChmCore;
 using namespace Platform;
+using namespace Windows::Foundation::Collections;
 
 class EbookTocExtractor : public EbookTocVisitor{
 private:
@@ -96,4 +97,21 @@ bool Chm::HasData(Platform::String^ path)
     ScopedMem<WCHAR> plainUrl(url::GetFullPath(path->Data()));
     ScopedMem<char> urlUtf8(str::conv::ToUtf8(plainUrl));
     return doc_->HasData(urlUtf8);
+}
+
+Windows::Foundation::Collections::IIterable<Platform::String^>^ Chm::EnumerateFiles()
+{
+    auto html_files = ref new Platform::Collections::Vector<String^>();
+    auto files = doc_->GetAllPaths();
+    for (size_t i = 0; i < files->Size(); ++i)
+    {
+        char *file = files->At(i);
+        if (str::EndsWithI(file, ".htm") || str::EndsWithI(file, ".html"))
+        {
+            ScopedMem<WCHAR> tmp(str::conv::FromUtf8(file));
+            html_files->Append(ref new String(tmp));
+        }
+    }
+    FreeVecMembers(*files);
+    return html_files;
 }

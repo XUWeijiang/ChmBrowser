@@ -220,6 +220,14 @@ namespace ChmBrowser.Common
             });
         }
 
+        public async Task<IEnumerable<string>> EnumerateFiles()
+        {
+            return await Task.Run(() =>
+                {
+                    return Chm.EnumerateFiles();
+                });
+        }
+
         public async Task CreateThumbnailFile(Func<IRandomAccessStream, Task> create)
         {
             if (await Snapshot.CreateSnapshot(Key, create))

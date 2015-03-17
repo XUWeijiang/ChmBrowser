@@ -97,6 +97,7 @@
             <CommandBar.SecondaryCommands>
                 <AppBarButton x:Uid="GoBack" Label="后退" IsEnabled="{Binding ElementName=webView, Path=CanGoBack}" Click="GoBack_Click" Tag="1"/>
                 <AppBarButton x:Uid="GoForward" Label="前进" IsEnabled="{Binding ElementName=webView, Path=CanGoForward}" Click="GoForward_Click" Tag="1"/>
+                <AppBarButton x:Uid="GoSearch" Label="搜索..." Click="GoSearch_Click" Tag="3"/>
                 <AppBarButton x:Uid="Settings" Label="设置..." Click="GoSetting_Click" Tag="3"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>

@@ -34,7 +34,6 @@ namespace ChmBrowser
     /// </summary>
     public sealed partial class ReadingPage : Page
     {
-        private Mutex _mutex = new Mutex();
         private Uri _lastWebViewUrl;
         private ChmStreamUriTResolver _uriResolver;
         private ChmFile _chmFile;
@@ -251,7 +250,7 @@ namespace ChmBrowser
 
         private void LeavePage()
         {
-            if (Frame.CanGoBack && Frame.BackStack[Frame.BackStack.Count - 1].SourcePageType == typeof(MainPage))
+            if (Frame.CanGoBack)
             {
                 Frame.GoBack();
             }
@@ -331,7 +330,7 @@ namespace ChmBrowser
             HardwareButtons.BackPressed -= HardwareButtons_BackPressed;
             Application.Current.Suspending -= Current_Suspending;
 
-            if (e.SourcePageType == typeof(ContentPage))
+            if (e.SourcePageType == typeof(ContentPage) || e.SourcePageType == typeof(SearchPage))
             {
                 SharedChmFile = _chmFile;
                 NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Required;
@@ -429,6 +428,28 @@ namespace ChmBrowser
             //settingRoot.Visibility = Windows.UI.Xaml.Visibility.Visible;
             root.Children.Add(settingRoot);
             settingRoot.UpdateLayout();
+        }
+        private void RemoveSearchPageFromHistory()
+        {
+            if (Frame.CanGoBack)
+            {
+                for (int i = 0; i < Frame.BackStackDepth; ++i)
+                {
+                    if (Frame.BackStack[i].SourcePageType == typeof(ReadingPage))
+                    {
+                        for (int j = Frame.BackStackDepth - 1; j >= i; --j)
+                        {
+                            Frame.BackStack.RemoveAt(j);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        private void GoSearch_Click(object sender, RoutedEventArgs e)
+        {
+            RemoveSearchPageFromHistory();
+            Frame.Navigate(typeof(SearchPage));
         }
         private void HideSetting()
         {

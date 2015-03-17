@@ -47,6 +47,7 @@ namespace ChmCore
         Chm(Platform::String^ file, bool loadOutline);
     public:
         Platform::Array<byte>^ GetData(Platform::String^ path);
+        Windows::Foundation::Collections::IIterable<Platform::String^>^ EnumerateFiles();
         bool HasData(Platform::String^ path);
     public:
         static bool IsValidChmFile(Platform::String^ file);
