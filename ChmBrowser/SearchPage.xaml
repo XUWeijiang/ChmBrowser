@@ -49,7 +49,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <ProgressRing x:Name="progressRing" IsActive="True" Width="50" Height="50"></ProgressRing>
-            <Button Grid.Row="1" Content="Cancel" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Click="Button_Click"/>
+            <Button x:Uid="Cancel" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Click="Button_Click"/>
         </Grid>
     </Grid>
 </Page>

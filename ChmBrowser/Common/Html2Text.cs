@@ -15,8 +15,10 @@ namespace ChmBrowser.Common
             using (MemoryStream ms = new MemoryStream(rawHtml))
             {
                 HtmlDocument doc = new HtmlDocument();
+                doc.OptionAutoCloseOnEnd = true;
                 doc.Load(ms);
-                title = doc.DocumentNode.Descendants("title").SingleOrDefault().InnerText;
+                var titleNode = doc.DocumentNode.Descendants("title").SingleOrDefault();
+                title = titleNode != null? titleNode.InnerText: null;
                 return ConvertToText(doc);
             }
         }

@@ -267,4 +267,7 @@
   <data name="GoSearch.Label" xml:space="preserve">
     <value>搜索...</value>
   </data>
+  <data name="Cancel.Content" xml:space="preserve">
+    <value>取消</value>
+  </data>
 </root>

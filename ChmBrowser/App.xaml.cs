@@ -53,7 +53,8 @@ namespace ChmBrowser
             {
                 if (rootFrame.CurrentSourcePageType != typeof(OneDriveBrowserPage)
                     && rootFrame.CurrentSourcePageType != typeof(ReadingPage)
-                    && rootFrame.CurrentSourcePageType != typeof(ContentPage))
+                    && rootFrame.CurrentSourcePageType != typeof(ContentPage)
+                    && rootFrame.CurrentSourcePageType != typeof(SearchPage))
                 {
                     e.Handled = true;
                     rootFrame.GoBack();

@@ -19,6 +19,7 @@ using ChmBrowser.Common;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Threading;
+using Windows.Phone.UI.Input;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -71,6 +72,7 @@ namespace ChmBrowser
                 Frame.GoBack();
                 return;
             }
+            HardwareButtons.BackPressed += HardwareButtons_BackPressed;
             _mode = e.NavigationMode;
             ChmFile obj;
             HideProgress();
@@ -92,8 +94,22 @@ namespace ChmBrowser
             }
         }
 
+        async void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            e.Handled = true;
+            if (progressRing.IsActive)
+            {
+                await CancelSearchTask();
+            }
+            else
+            {
+                Frame.GoBack();
+            }
+        }
+
         protected async override void OnNavigatedFrom(NavigationEventArgs e)
         {
+            HardwareButtons.BackPressed -= HardwareButtons_BackPressed;
             await CancelSearchTask();
         }
 
@@ -153,6 +169,10 @@ namespace ChmBrowser
                                 var htmlData = obj.GetData(file).Result;
                                 string title;
                                 string text = Html2Text.ToText(htmlData, out title);
+                                if (string.IsNullOrEmpty(title))
+                                {
+                                    title = file;
+                                }
                                 int score = GetScore(text, key);
                                 if (score > 0)
                                 {
