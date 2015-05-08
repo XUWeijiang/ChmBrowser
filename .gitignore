@@ -13,3 +13,4 @@ bin/
 Debug/
 BundleArtifacts/
 ipch/
+.vs/

@@ -237,6 +237,10 @@ bool ChmDoc::Load(const WCHAR *fileName)
     if (!ParseSystemData())
         return false;
 
+    if (!codepage) {
+        codepage = CP_CHM_DEFAULT;
+    }
+    homePath.Set(ToUtf8((const unsigned char*)homePath.Get()));
     if (!HasData(homePath)) {
         const char *pathsToTest[] = {
             "/index.htm", "/index.html", "/default.htm", "/default.html"
@@ -249,9 +253,6 @@ bool ChmDoc::Load(const WCHAR *fileName)
     if (!HasData(homePath))
         return false;
 
-    if (!codepage) {
-        codepage = CP_CHM_DEFAULT; 
-    }
     //if (GetACP() == codepage)
     //    codepage = CP_ACP;
 
@@ -276,7 +277,7 @@ WCHAR *ChmDoc::GetProperty(DocumentProperty prop)
 WCHAR* ChmDoc::GetHomePath()
 {
     ScopedMem<WCHAR> result;
-    result.Set(ToStr(homePath));
+    result.Set(str::conv::FromUtf8(homePath));
     return result.StealData();
 }
 
